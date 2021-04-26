@@ -1,0 +1,4 @@
+include 'microservice:master-service'
+include 'microservice:reservation-service'
+include 'microservice:composite-service'
+include 'kmtp-common'
