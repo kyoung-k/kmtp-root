@@ -1,16 +1,21 @@
 package com.kmtp.h2server;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.h2.tools.Server;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 
 @Configuration
 public class H2ServerConfiguration {
 
-    @Bean(initMethod = "start", destroyMethod = "stop")
-    public Server inMemoryH2DatabaseaServer() throws SQLException {
-        return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9990");
+    @Bean
+    @ConfigurationProperties("spring.datasource.hikari")
+    public DataSource dataSource() throws SQLException {
+        Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "8889").start();
+        return new HikariDataSource();
     }
 }
