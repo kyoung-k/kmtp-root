@@ -16,6 +16,11 @@ public class MasterHandler {
 
     private MasterRepository masterRepository;
 
+    @Autowired
+    public MasterHandler(MasterRepository masterRepository) {
+        this.masterRepository = masterRepository;
+    }
+
     public Mono<ServerResponse> endpointTest(ServerRequest request) {
         return ok().contentType(MediaType.APPLICATION_JSON)
                 .body(masterRepository.findById(1l), MasterEntity.class);
