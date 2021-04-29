@@ -1,9 +1,14 @@
 server:
   port: 8881
 
-spring.jpa.hibernate.ddl-auto: create
-
 spring.r2dbc:
-  url: r2dbc:h2:tcp://localhost:8889/mem:kmtp
-  username: sa
-  password: sa
+  url: r2dbc:mysql://localhost:3306/test_schema?useUnicode=true&characterEncoding=utf8
+  username: kyoung
+  password: password
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          r2dbc: DEBUG

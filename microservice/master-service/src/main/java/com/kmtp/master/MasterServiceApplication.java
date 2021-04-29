@@ -12,10 +12,6 @@ public class MasterServiceApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(MasterServiceApplication.class, args);
-
-        String h2DbUrl = ctx.getEnvironment().getProperty("spring.datasource.hikari.jdbc-url");
-        log.info("Connected to h2Db: {}", h2DbUrl);
-//        SpringApplication.run(MasterServiceApplication.class, args);
     }
 
 }

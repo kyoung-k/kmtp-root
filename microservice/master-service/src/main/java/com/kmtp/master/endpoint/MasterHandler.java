@@ -18,6 +18,6 @@ public class MasterHandler {
 
     public Mono<ServerResponse> endpointTest(ServerRequest request) {
         return ok().contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(masterRepository.findById(1)), MasterEntity.class);
+                .body(masterRepository.findById(1l), MasterEntity.class);
     }
 }
