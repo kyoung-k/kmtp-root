@@ -1,13 +1,13 @@
-package com.kmtp.reservationservice;
+package com.kmtp.composite;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ReservationServiceApplication {
+public class CompositeServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ReservationServiceApplication.class, args);
+        SpringApplication.run(CompositeServiceApplication.class, args);
     }
 
 }

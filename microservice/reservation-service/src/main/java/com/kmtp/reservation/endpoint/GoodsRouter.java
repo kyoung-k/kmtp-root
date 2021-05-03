@@ -1,4 +1,4 @@
-package com.kmtp.master.endpoint;
+package com.kmtp.reservation.endpoint;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,19 +8,19 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
-public class MasterRouter {
+public class GoodsRouter {
 
-    private MasterHandler masterHandler;
+    private GoodsHandler goodsHandler;
 
     @Autowired
-    public MasterRouter(MasterHandler masterHandler) {
-        this.masterHandler = masterHandler;
+    public GoodsRouter(GoodsHandler goodsHandler) {
+        this.goodsHandler = goodsHandler;
     }
 
     @Bean
-    public RouterFunction<ServerResponse> masterRoutes() {
+    public RouterFunction<ServerResponse> goodsRoutes() {
         return RouterFunctions.route()
-                .GET("/master/{id}", masterHandler::getMaster)
+                .GET("/goods/{id}", goodsHandler::getGoods)
                 .build();
     }
 }

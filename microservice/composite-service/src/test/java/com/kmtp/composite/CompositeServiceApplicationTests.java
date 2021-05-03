@@ -1,4 +1,4 @@
-package com.kmtp.compositeservice;
+package com.kmtp.composite;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

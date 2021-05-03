@@ -8,19 +8,19 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
-public class MasterRouter {
+public class MemberRouter {
 
-    private MasterHandler masterHandler;
+    private MemberHandler memberHandler;
 
     @Autowired
-    public MasterRouter(MasterHandler masterHandler) {
-        this.masterHandler = masterHandler;
+    public MemberRouter(MemberHandler memberHandler) {
+        this.memberHandler = memberHandler;
     }
 
     @Bean
-    public RouterFunction<ServerResponse> masterRoutes() {
+    public RouterFunction<ServerResponse> memberRoutes() {
         return RouterFunctions.route()
-                .GET("/master/{id}", masterHandler::getMaster)
+                .GET("/member/{id}", memberHandler::getMember)
                 .build();
     }
 }

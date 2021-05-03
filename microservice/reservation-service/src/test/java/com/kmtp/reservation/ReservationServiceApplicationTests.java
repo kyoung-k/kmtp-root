@@ -1,4 +1,4 @@
-package com.kmtp.reservationservice;
+package com.kmtp.reservation;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

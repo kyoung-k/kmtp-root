@@ -1,7 +1,7 @@
 package com.kmtp.master.endpoint;
 
-import com.kmtp.master.persistence.MasterEntity;
-import com.kmtp.master.persistence.MasterRepository;
+import com.kmtp.master.persistence.MemberEntity;
+import com.kmtp.master.persistence.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -12,17 +12,17 @@ import reactor.core.publisher.Mono;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 @Component
-public class MasterHandler {
+public class MemberHandler {
 
-    private MasterRepository masterRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
-    public MasterHandler(MasterRepository masterRepository) {
-        this.masterRepository = masterRepository;
+    public MemberHandler(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
-    public Mono<ServerResponse> getMaster(ServerRequest request) {
+    public Mono<ServerResponse> getMember(ServerRequest request) {
         return ok().contentType(MediaType.APPLICATION_JSON)
-                .body(masterRepository.findById(1l), MasterEntity.class);
+                .body(memberRepository.findById(1l), MemberEntity.class);
     }
 }

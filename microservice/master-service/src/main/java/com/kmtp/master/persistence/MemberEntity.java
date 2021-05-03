@@ -6,16 +6,19 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-
 @Data
 @Builder
-@Table("masters")
-public class MasterEntity {
+@Table("members")
+public class MemberEntity {
 
     @Id
     private Long id;
+    @Column("email")
+    private String email;
     @Column("name")
     private String name;
-    @Column("information")
-    private String information;
+    @Column("age")
+    private int age;
+    @Column("address")
+    private String address;
 }

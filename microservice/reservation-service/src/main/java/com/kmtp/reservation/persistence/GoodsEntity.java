@@ -1,4 +1,4 @@
-package com.kmtp.master.persistence;
+package com.kmtp.reservation.persistence;
 
 import lombok.Builder;
 import lombok.Data;
@@ -6,16 +6,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-
 @Data
 @Builder
-@Table("masters")
-public class MasterEntity {
+@Table("goods")
+public class GoodsEntity {
 
     @Id
     private Long id;
+    @Column("master_id")
+    private Long masterId;
     @Column("name")
     private String name;
-    @Column("information")
-    private String information;
 }
