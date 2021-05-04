@@ -1,6 +1,5 @@
 package com.kmtp.common.mapper;
 
-import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
@@ -11,8 +10,7 @@ public interface GenericMapper <D, E> {
     D entityToApi(E entity);
 
     @Mappings({
-            @Mapping(target = "id", ignore = true),
-            @Mapping(target = "version", ignore = true)
+        @Mapping(target = "version", ignore = true)
     })
     E apiToEntity(D api);
 

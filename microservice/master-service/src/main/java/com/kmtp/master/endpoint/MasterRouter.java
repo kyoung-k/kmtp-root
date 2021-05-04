@@ -23,6 +23,7 @@ public class MasterRouter {
         return RouterFunctions.route()
                 .GET("/master/{id}", masterHandler::getMaster)
                 .POST("/master", masterHandler::postMaster)
+                .PUT("/master", masterHandler::putMaster)
                 .build();
     }
 }
