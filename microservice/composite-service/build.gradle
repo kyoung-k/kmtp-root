@@ -14,6 +14,10 @@ configurations {
     }
 }
 
+ext {
+    mapstructVersion = "1.4.2.Final"
+}
+
 repositories {
     mavenCentral()
 }
@@ -23,8 +27,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'dev.miku:r2dbc-mysql:0.8.2.RELEASE'
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+
     compileOnly 'org.projectlombok:lombok'
+
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
+
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }

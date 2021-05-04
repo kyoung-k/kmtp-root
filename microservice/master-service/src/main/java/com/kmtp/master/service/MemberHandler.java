@@ -1,4 +1,4 @@
-package com.kmtp.master.endpoint;
+package com.kmtp.master.service;
 
 import com.kmtp.master.persistence.MemberEntity;
 import com.kmtp.master.persistence.MemberRepository;

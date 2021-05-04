@@ -1,5 +1,6 @@
 package com.kmtp.master.endpoint;
 
+import com.kmtp.master.service.MasterHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ public class MasterRouter {
     public RouterFunction<ServerResponse> masterRoutes() {
         return RouterFunctions.route()
                 .GET("/master/{id}", masterHandler::getMaster)
+                .POST("/master", masterHandler::postMaster)
                 .build();
     }
 }

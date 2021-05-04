@@ -8,6 +8,10 @@ group = 'com.kmtp'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+ext {
+    mapstructVersion = "1.4.2.Final"
+}
+
 repositories {
     mavenCentral()
 }
@@ -23,9 +27,15 @@ jar {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'io.r2dbc:r2dbc-h2'
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+    compileOnly 'org.projectlombok:lombok'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
+
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }

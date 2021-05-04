@@ -44,6 +44,7 @@ create table masters
 (
     id          bigint auto_increment
         primary key,
+    version     int,
     name        varchar(100) null,
     information varchar(500) null
 );
