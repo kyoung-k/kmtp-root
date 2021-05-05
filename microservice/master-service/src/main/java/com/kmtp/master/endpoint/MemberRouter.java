@@ -22,6 +22,9 @@ public class MemberRouter {
     public RouterFunction<ServerResponse> memberRoutes() {
         return RouterFunctions.route()
                 .GET("/member/{id}", memberHandler::getMember)
+                .POST("/member", memberHandler::postMember)
+                .PUT("/member", memberHandler::putMember)
+                .DELETE("/member/{id}", memberHandler::deleteMember)
                 .build();
     }
 }

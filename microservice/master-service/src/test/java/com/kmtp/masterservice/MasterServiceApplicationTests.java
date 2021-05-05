@@ -9,5 +9,4 @@ class MasterServiceApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

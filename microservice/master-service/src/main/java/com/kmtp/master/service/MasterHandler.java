@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -29,11 +30,16 @@ public class MasterHandler {
     }
 
     public Mono<ServerResponse> getMaster( ServerRequest request ) {
+
+        final Long id = Long.parseLong( request.pathVariable("id") );
+
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(masterRepository.findById(1l), MasterEntity.class);
+                .body(masterRepository.findById(id)
+                        .map(MasterMapper.INSTANCE::entityToApi), Master.class);
     }
 
     public Mono<ServerResponse> postMaster( ServerRequest request ) {
+
         return request.bodyToMono(Master.class)
                 .log()
                 .map(MasterMapper.INSTANCE::apiToEntity)
@@ -44,17 +50,18 @@ public class MasterHandler {
     }
 
     public Mono<ServerResponse> putMaster( ServerRequest request ) {
+
         return request.bodyToMono(Master.class)
                 .log()
-                .flatMap(api -> masterRepository.findById(api.getId())
-                        .flatMap(entity -> {
+                .flatMap(masterRepository::updateMaster);
+    }
 
-                            entity.setName(api.getName());
-                            entity.setInformation(api.getInformation());
+    public Mono<ServerResponse> deleteMaster(ServerRequest request) {
 
-                            return ServerResponse.ok()
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .body(masterRepository.save(entity), MasterEntity.class);
-                        }));
+        final Long id = Long.parseLong( request.pathVariable("id") );
+
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(masterRepository.deleteById(id), Master.class);
     }
 }

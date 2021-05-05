@@ -11,8 +11,8 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @Builder
-@Table("masters")
 @AllArgsConstructor
+@Table("masters")
 public class MasterEntity {
 
     @Id

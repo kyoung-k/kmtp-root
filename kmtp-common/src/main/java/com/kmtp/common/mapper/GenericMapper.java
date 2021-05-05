@@ -10,7 +10,8 @@ public interface GenericMapper <D, E> {
     D entityToApi(E entity);
 
     @Mappings({
-        @Mapping(target = "version", ignore = true)
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "version", ignore = true)
     })
     E apiToEntity(D api);
 

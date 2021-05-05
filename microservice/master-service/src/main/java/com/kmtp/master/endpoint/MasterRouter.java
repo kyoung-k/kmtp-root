@@ -24,6 +24,7 @@ public class MasterRouter {
                 .GET("/master/{id}", masterHandler::getMaster)
                 .POST("/master", masterHandler::postMaster)
                 .PUT("/master", masterHandler::putMaster)
+                .DELETE("/master/{id}", masterHandler::deleteMaster)
                 .build();
     }
 }
