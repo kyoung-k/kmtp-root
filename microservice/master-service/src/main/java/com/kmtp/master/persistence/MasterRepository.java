@@ -10,17 +10,15 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface MasterRepository extends ReactiveCrudRepository<MasterEntity, Long> {
 
-    default Mono<ServerResponse> updateMaster(Master master) {
+    default Mono<?> updateMaster(Master master) {
 
         return this.findById(master.getId())
-                .flatMap(entity -> {
+                .flatMap(entity -> entity.change(me -> {
 
-                    entity.setName(master.getName());
-                    entity.setInformation(master.getInformation());
-
-                    return ServerResponse.ok()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .body(this.save(entity), MasterEntity.class);
-                });
+                        me.setName(master.getName());
+                        me.setInformation(master.getInformation());
+                    })
+                    .persistenceMono(() -> this.save(entity))
+                );
     }
 }

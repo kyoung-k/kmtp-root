@@ -1,5 +1,6 @@
 package com.kmtp.master.persistence;
 
+import com.kmtp.common.entity.GenericEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @AllArgsConstructor
 @Table("masters")
-public class MasterEntity {
+public class MasterEntity extends GenericEntity<MasterEntity> {
 
     @Id
     private Long id;

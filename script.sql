@@ -53,6 +53,7 @@ create table members
 (
     id      bigint auto_increment
         primary key,
+    version int,
     email   varchar(100)     null,
     name    varchar(100)     null,
     age     tinyint unsigned null,

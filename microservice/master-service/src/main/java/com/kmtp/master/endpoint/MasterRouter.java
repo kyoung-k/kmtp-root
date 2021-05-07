@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Configuration
 public class MasterRouter {
 
-    private MasterHandler masterHandler;
+    final private MasterHandler masterHandler;
 
     @Autowired
     public MasterRouter(MasterHandler masterHandler) {

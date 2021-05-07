@@ -1,28 +1,21 @@
 package com.kmtp.master.service;
 
-import com.kmtp.master.persistence.MasterEntity;
 import com.kmtp.master.persistence.MasterRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.BodyInserter;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.util.Optional;
-import java.util.function.Function;
 
 @Slf4j
 @Component
 public class MasterHandler {
 
-    private MasterRepository masterRepository;
+    final private MasterRepository masterRepository;
 
     @Autowired
     public MasterHandler(MasterRepository masterRepository) {
@@ -52,8 +45,8 @@ public class MasterHandler {
     public Mono<ServerResponse> putMaster( ServerRequest request ) {
 
         return request.bodyToMono(Master.class)
-                .log()
-                .flatMap(masterRepository::updateMaster);
+                .flatMap(masterRepository::updateMaster)
+                .flatMap(result -> ServerResponse.noContent().build());
     }
 
     public Mono<ServerResponse> deleteMaster(ServerRequest request) {

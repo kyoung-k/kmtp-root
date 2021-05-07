@@ -22,10 +22,6 @@ repositories {
     mavenCentral()
 }
 
-test {
-    useJUnitPlatform()
-}
-
 dependencies {
     implementation project(':kmtp-common')
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'

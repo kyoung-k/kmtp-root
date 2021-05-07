@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Configuration
 public class MemberRouter {
 
-    private MemberHandler memberHandler;
+    final private MemberHandler memberHandler;
 
     @Autowired
     public MemberRouter(MemberHandler memberHandler) {
@@ -23,7 +23,7 @@ public class MemberRouter {
         return RouterFunctions.route()
                 .GET("/member/{id}", memberHandler::getMember)
                 .POST("/member", memberHandler::postMember)
-                .PUT("/member", memberHandler::putMember)
+                .PUT("/member/{id}", memberHandler::putMember)
                 .DELETE("/member/{id}", memberHandler::deleteMember)
                 .build();
     }
