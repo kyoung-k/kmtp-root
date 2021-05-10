@@ -77,6 +77,7 @@ create table schedules
 (
     id         bigint auto_increment
         primary key,
+    version int,
     master_id  bigint      not null,
     start_time varchar(20) null,
     end_time   varchar(20) null

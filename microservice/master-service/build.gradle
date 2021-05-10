@@ -28,6 +28,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'dev.miku:r2dbc-mysql:0.8.2.RELEASE'
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     compileOnly 'org.projectlombok:lombok'
 
