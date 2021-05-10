@@ -1,6 +1,7 @@
 package com.kmtp.master.service;
 
 import com.google.gson.Gson;
+import com.kmtp.master.endpoint.Schedule;
 import com.kmtp.master.persistence.ScheduleEntity;
 import com.kmtp.master.persistence.ScheduleRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.EntityResponse;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Component

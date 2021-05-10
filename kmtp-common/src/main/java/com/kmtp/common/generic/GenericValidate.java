@@ -13,22 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.master.endpoint;
+package com.kmtp.common.generic;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+public interface GenericValidate<T> {
 
-import javax.validation.constraints.NotBlank;
-import javax.xml.transform.Source;
-
-@Data
-@Builder
-@AllArgsConstructor
-public class Master {
-
-    private Long id;
-    @NotBlank(message = "호텔명을 입력해 주세요.")
-    private String name;
-    private String information;
+    void validate(T api);
 }

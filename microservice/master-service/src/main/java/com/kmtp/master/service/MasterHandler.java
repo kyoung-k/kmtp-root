@@ -15,26 +15,34 @@
  */
 package com.kmtp.master.service;
 
+import com.kmtp.common.generic.GenericValidate;
 import com.kmtp.master.endpoint.Master;
 import com.kmtp.master.persistence.MasterRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
 @Slf4j
 @Component
-public class MasterHandler {
+public class MasterHandler implements GenericValidate<Master> {
 
+    final private Validator validator;
     final private MasterRepository masterRepository;
 
     @Autowired
-    public MasterHandler(MasterRepository masterRepository) {
+    public MasterHandler(Validator validator, MasterRepository masterRepository) {
+        this.validator = validator;
         this.masterRepository = masterRepository;
     }
 
@@ -42,6 +50,7 @@ public class MasterHandler {
 
         final Long id = Long.parseLong( request.pathVariable("id") );
         Mono<Master> master = masterRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "not found master-id.")))
                 .map(MasterMapper.INSTANCE::entityToApi);
 
         return ServerResponse.ok()
@@ -52,16 +61,18 @@ public class MasterHandler {
     public Mono<ServerResponse> post( ServerRequest request ) {
 
         return request.bodyToMono(Master.class)
-            .map(MasterMapper.INSTANCE::apiToEntity)
-            .flatMap(masterRepository::save)
-            .flatMap(result -> ServerResponse
-                .created(URI.create(request.path()))
-                .build());
+                .doOnNext(this::validate)
+                .map(MasterMapper.INSTANCE::apiToEntity)
+                .flatMap(masterRepository::save)
+                .flatMap(result -> ServerResponse
+                    .created(URI.create(request.path()))
+                    .build());
     }
 
     public Mono<ServerResponse> put( ServerRequest request ) {
 
         return request.bodyToMono(Master.class)
+                .doOnNext(this::validate)
                 .flatMap(masterRepository::updateMaster)
                 .flatMap(result -> ServerResponse.noContent().build());
     }
@@ -72,5 +83,15 @@ public class MasterHandler {
 
         return ServerResponse.noContent()
                 .build(masterRepository.deleteById(id));
+    }
+
+    @Override
+    public void validate(Master api) {
+
+        Errors errors = new BeanPropertyBindingResult(api, Master.class.getName());
+        validator.validate(api, errors);
+        if (errors.hasErrors()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 }

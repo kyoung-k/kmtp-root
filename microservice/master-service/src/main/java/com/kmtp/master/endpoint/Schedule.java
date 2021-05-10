@@ -1,4 +1,4 @@
-package com.kmtp.master.service;
+package com.kmtp.master.endpoint;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
