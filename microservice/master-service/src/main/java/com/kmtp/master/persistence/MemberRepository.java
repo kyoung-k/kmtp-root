@@ -1,9 +1,22 @@
+/*
+ * Copyright (c) 2021-Present KYoung.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.kmtp.master.persistence;
 
-import com.kmtp.master.service.Member;
-import com.kmtp.master.service.MemberMapper;
+import com.kmtp.master.endpoint.Member;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -14,16 +27,11 @@ public interface MemberRepository extends ReactiveCrudRepository<MemberEntity, L
     default Mono<ServerResponse> updateMember(Member member) {
 
         return this.findById(member.getId())
-                .flatMap(entity -> {
-
-                    entity.setEmail(member.getEmail());
-                    entity.setName(member.getName());
-                    entity.setAge(member.getAge());
-                    entity.setAddress(member.getAddress());
-
-                    return ServerResponse.ok()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .body(this.save(entity).map(MemberMapper.INSTANCE::entityToApi), Member.class);
-                });
+                .flatMap(entity -> entity.change(me -> {
+                    me.setEmail(member.getEmail());
+                    me.setName(member.getName());
+                    me.setAge(member.getAge());
+                    me.setAddress(member.getAddress());
+                }).persistenceMono(() -> this.save(entity)));
     }
 }

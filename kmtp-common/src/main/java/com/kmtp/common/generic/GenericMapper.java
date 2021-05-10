@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.master.persistence;
+package com.kmtp.common.generic;
 
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import reactor.core.publisher.Mono;
 
-@Repository
-public interface ScheduleRepository extends ReactiveCrudRepository<ScheduleEntity, Long> {
+import java.util.List;
 
-    Flux<ScheduleEntity> findByMasterId(Long masterId);
+public interface GenericMapper <D, E> {
 
-    Mono<Long> countByMasterId(Long masterId);
+    D entityToApi(E entity);
 
-    Mono<ScheduleEntity> deleteByMasterId(Long masterId);
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "version", ignore = true)
+    })
+    E apiToEntity(D api);
+
+    List<D> entityListToApiList(List<E> entityList);
+
+    List<E> apiListToEntityList(List<D> apiList);
 }

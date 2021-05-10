@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.master.persistence;
+package com.kmtp.master.endpoint;
 
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-@Repository
-public interface ScheduleRepository extends ReactiveCrudRepository<ScheduleEntity, Long> {
+@Data
+@Builder
+@AllArgsConstructor
+public class Member {
 
-    Flux<ScheduleEntity> findByMasterId(Long masterId);
-
-    Mono<Long> countByMasterId(Long masterId);
-
-    Mono<ScheduleEntity> deleteByMasterId(Long masterId);
+    private Long id;
+    private String email;
+    private String name;
+    private int age;
+    private String address;
 }

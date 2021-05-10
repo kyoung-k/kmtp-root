@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.common.entity;
+package com.kmtp.common.generic;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,8 +21,13 @@ import reactor.core.publisher.Mono;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class GenericEntity <T> {
+public abstract class GenericEntity <T> {
 
+    /**
+     * Functions used in PUT API
+     * @param consumer
+     * @return generic T
+     */
     public T change(Consumer<T> consumer) {
         consumer.accept((T) this);
         return (T) this;
@@ -31,18 +36,18 @@ public class GenericEntity <T> {
     /**
      * Functional Methods for Supporting {@link Mono} Permanence in Entity Objects
      * @param supplier
-     * @return
+     * @return repository result {@link Mono}
      */
-    public Mono<?> persistenceMono(Supplier<? extends Mono> supplier) {
+    public <T> Mono<T> persistenceMono(Supplier<? extends Mono> supplier) {
         return supplier.get();
     }
 
     /**
      * Functional Methods for Supporting {@link Flux} Permanence in Entity Objects
      * @param supplier
-     * @return
+     * @return repository result {@link Flux}
      */
-    public Flux<?> persistenceFlux(Supplier<? extends Flux> supplier) {
+    public <T> Flux<T> persistenceFlux(Supplier<? extends Flux> supplier) {
         return supplier.get();
     }
 }
