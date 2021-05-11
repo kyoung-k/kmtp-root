@@ -16,6 +16,7 @@
 package com.kmtp.master.service;
 
 import com.kmtp.common.generic.GenericValidate;
+import com.kmtp.common.http.HttpErrorInfo;
 import com.kmtp.master.endpoint.Master;
 import com.kmtp.master.persistence.MasterRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -49,13 +50,14 @@ public class MasterHandler implements GenericValidate<Master> {
     public Mono<ServerResponse> get( ServerRequest request ) {
 
         final Long id = Long.parseLong( request.pathVariable("id") );
-        Mono<Master> master = masterRepository.findById(id)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "not found master-id.")))
-                .map(MasterMapper.INSTANCE::entityToApi);
 
-        return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(master, Master.class);
+        return masterRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NO_CONTENT, "not found master-id.")))
+                .map(MasterMapper.INSTANCE::entityToApi)
+                .flatMap(master -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(master, Master.class))
+                .onErrorResume(HttpErrorInfo::build);
     }
 
     public Mono<ServerResponse> post( ServerRequest request ) {
@@ -65,8 +67,9 @@ public class MasterHandler implements GenericValidate<Master> {
                 .map(MasterMapper.INSTANCE::apiToEntity)
                 .flatMap(masterRepository::save)
                 .flatMap(result -> ServerResponse
-                    .created(URI.create(request.path()))
-                    .build());
+                        .created(URI.create(request.path()))
+                        .build())
+                .onErrorResume(HttpErrorInfo::build);
     }
 
     public Mono<ServerResponse> put( ServerRequest request ) {
@@ -74,15 +77,18 @@ public class MasterHandler implements GenericValidate<Master> {
         return request.bodyToMono(Master.class)
                 .doOnNext(this::validate)
                 .flatMap(masterRepository::updateMaster)
-                .flatMap(result -> ServerResponse.noContent().build());
+                .flatMap(result -> ServerResponse.noContent().build())
+                .onErrorResume(HttpErrorInfo::build);
     }
 
     public Mono<ServerResponse> delete(ServerRequest request) {
 
         final Long id = Long.parseLong( request.pathVariable("id") );
 
-        return ServerResponse.noContent()
-                .build(masterRepository.deleteById(id));
+        return masterRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "not found master-id.")))
+                .flatMap(masterEntity -> ServerResponse.noContent()
+                        .build(masterRepository.deleteById(id)));
     }
 
     @Override

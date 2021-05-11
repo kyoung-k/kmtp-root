@@ -15,9 +15,11 @@
  */
 package com.kmtp.master.endpoint;
 
+import com.kmtp.common.filter.FunctionalApiExceptionFilter;
 import com.kmtp.master.service.MasterHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -27,10 +29,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class MasterRouter {
 
     final private MasterHandler masterHandler;
+    final private FunctionalApiExceptionFilter functionalApiExceptionFilter;
 
     @Autowired
-    public MasterRouter(MasterHandler masterHandler) {
+    public MasterRouter(MasterHandler masterHandler, FunctionalApiExceptionFilter functionalApiExceptionFilter) {
         this.masterHandler = masterHandler;
+        this.functionalApiExceptionFilter = functionalApiExceptionFilter;
     }
 
     @Bean
@@ -40,6 +44,7 @@ public class MasterRouter {
                 .POST("/master", masterHandler::post)
                 .PUT("/master", masterHandler::put)
                 .DELETE("/master/{id}", masterHandler::delete)
+                .filter(functionalApiExceptionFilter.exceptionHandler())
                 .build();
     }
 }

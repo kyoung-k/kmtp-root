@@ -8,10 +8,10 @@ import org.springframework.context.annotation.ComponentScan;
 
 @Slf4j
 @SpringBootApplication
+@ComponentScan(basePackages={"com.kmtp"})
 public class MasterServiceApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(MasterServiceApplication.class, args);
     }
-
 }
