@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.master.endpoint;
+package com.kmtp.common.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import java.util.List;
 
-import javax.validation.constraints.NotBlank;
+public class ValidationException extends RuntimeException {
 
-@Data
-@Builder
-@AllArgsConstructor
-public class Master {
+    private List<ValidationErrorHandler.Error> errorsList;
 
-    private Long id;
-    @NotBlank
-    private String name;
-    private String information;
+    public ValidationException(List<ValidationErrorHandler.Error> errorsList, String message) {
+        super(message);
+        this.errorsList = errorsList;
+    }
+
+    public List<ValidationErrorHandler.Error> getErrorsList() {
+        return errorsList;
+    }
 }

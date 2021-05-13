@@ -15,14 +15,17 @@
  */
 package com.kmtp.common.http;
 
+import com.kmtp.common.exception.ValidationException;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -30,6 +33,7 @@ public class HttpErrorInfo {
 
     private ZonedDateTime timestamp;
     private String message;
+    private List<?> errors;
 
     /**
      * ResponseStatusException handler
@@ -38,14 +42,14 @@ public class HttpErrorInfo {
      */
     public static Mono<ServerResponse> build(ResponseStatusException responseStatusException) {
 
-        Mono<HttpErrorInfo> mono = Mono.just(HttpErrorInfo.builder()
+        Mono<HttpInfo> mono = Mono.just(HttpInfo.builder()
                 .timestamp(ZonedDateTime.now())
                 .message(responseStatusException.getReason())
                 .build());
 
         return ServerResponse.status(responseStatusException.getStatus().value())
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(mono, HttpErrorInfo.class);
+                .body(mono, HttpInfo.class);
     }
 
     /**
@@ -57,15 +61,31 @@ public class HttpErrorInfo {
 
         if (throwable instanceof ResponseStatusException) {
             return build((ResponseStatusException) throwable);
+        } else if (throwable instanceof ValidationException) {
+            return HttpErrorInfo.build((ValidationException) throwable);
         }
 
-        Mono<HttpErrorInfo> mono = Mono.just(HttpErrorInfo.builder()
+        Mono<HttpInfo> mono = Mono.just(HttpInfo.builder()
                 .timestamp(ZonedDateTime.now())
                 .message("Internal Server Error")
                 .build());
 
         return ServerResponse.status(500)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(mono, HttpErrorInfo.class);
+                .body(mono, HttpInfo.class);
+    }
+
+    public static Mono<ServerResponse> build(ValidationException validationException) {
+
+        Mono<HttpErrorInfo> mono = Mono.just(HttpErrorInfo.builder()
+                .timestamp(ZonedDateTime.now())
+                .message(validationException.getMessage())
+                .errors(validationException.getErrorsList())
+                .build());
+
+        return ServerResponse.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(mono, HttpInfo.class);
+
     }
 }

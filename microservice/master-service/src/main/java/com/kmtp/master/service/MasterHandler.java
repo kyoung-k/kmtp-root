@@ -15,6 +15,7 @@
  */
 package com.kmtp.master.service;
 
+import com.kmtp.common.exception.ValidationErrorHandler;
 import com.kmtp.common.generic.GenericValidate;
 import com.kmtp.common.http.HttpErrorInfo;
 import com.kmtp.master.endpoint.Master;
@@ -88,7 +89,8 @@ public class MasterHandler implements GenericValidate<Master> {
         return masterRepository.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "not found master-id.")))
                 .flatMap(masterEntity -> ServerResponse.noContent()
-                        .build(masterRepository.deleteById(id)));
+                        .build(masterRepository.deleteById(id)))
+                .onErrorResume(HttpErrorInfo::build);
     }
 
     @Override
@@ -97,7 +99,7 @@ public class MasterHandler implements GenericValidate<Master> {
         Errors errors = new BeanPropertyBindingResult(api, Master.class.getName());
         validator.validate(api, errors);
         if (errors.hasErrors()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            ValidationErrorHandler.handle(errors);
         }
     }
 }
