@@ -15,10 +15,13 @@
  */
 package com.kmtp.master.service;
 
-import com.kmtp.master.endpoint.Master;
+import com.kmtp.common.generic.GenericError;
+import com.kmtp.common.generic.GenericValidator;
+import com.kmtp.common.http.ResponseErrorHandler;
 import com.kmtp.master.endpoint.Member;
 import com.kmtp.master.persistence.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -31,45 +34,57 @@ import java.net.URI;
 public class MemberHandler {
 
     final private MemberRepository memberRepository;
+    final private GenericValidator genericValidator;
 
     @Autowired
-    public MemberHandler(MemberRepository memberRepository) {
+    public MemberHandler(MemberRepository memberRepository, GenericValidator genericValidator) {
         this.memberRepository = memberRepository;
+        this.genericValidator = genericValidator;
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
 
         final Long id = Long.parseLong( request.pathVariable("id") );
-        Mono<Member> member = memberRepository.findById(id)
-                .map(MemberMapper.INSTANCE::entityToApi);
 
-        return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(member, Master.class);
+        return memberRepository.findById(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found member-id."))
+                .map(MemberMapper.INSTANCE::entityToApi)
+                .flatMap(member -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(member, Member.class))
+                .onErrorResume(ResponseErrorHandler::build);
+
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {
 
         return request.bodyToMono(Member.class)
+                .doOnNext(member -> genericValidator.validate(member, Member.class))
                 .map(MemberMapper.INSTANCE::apiToEntity)
                 .flatMap(memberRepository::save)
                 .flatMap(result -> ServerResponse
                     .created(URI.create(request.path()))
-                    .build());
+                    .build())
+                .onErrorResume(ResponseErrorHandler::build);
     }
 
     public Mono<ServerResponse> put(ServerRequest request) {
 
         return request.bodyToMono(Member.class)
+                .doOnNext(member -> genericValidator.validate(member, Member.class))
                 .flatMap(memberRepository::updateMember)
-                .flatMap(result -> ServerResponse.noContent().build());
+                .flatMap(result -> ServerResponse.noContent().build())
+                .onErrorResume(ResponseErrorHandler::build);
     }
 
     public Mono<ServerResponse> delete(ServerRequest request) {
 
         final Long id = Long.parseLong( request.pathVariable("id") );
 
-        return ServerResponse.noContent()
-                .build(memberRepository.deleteById(id));
+        return memberRepository.findById(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found member-id."))
+                .flatMap(memberEntity -> ServerResponse.ok()
+                        .build(memberRepository.deleteById(id)))
+                .onErrorResume(ResponseErrorHandler::build);
     }
 }

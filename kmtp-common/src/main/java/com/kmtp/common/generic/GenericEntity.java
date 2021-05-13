@@ -25,7 +25,7 @@ public abstract class GenericEntity <T> {
 
     /**
      * Functions used in PUT API
-     * @param consumer
+     * @param consumer consumer
      * @return generic T
      */
     public T change(Consumer<T> consumer) {
@@ -35,19 +35,20 @@ public abstract class GenericEntity <T> {
 
     /**
      * Functional Methods for Supporting {@link Mono} Permanence in Entity Objects
-     * @param supplier
+     * @param supplier r2dbc를 실행하는 supplier
      * @return repository result {@link Mono}
      */
-    public <T> Mono<T> persistenceMono(Supplier<? extends Mono> supplier) {
+    public <S extends T> Mono<S> persistenceMono(Supplier<? extends Mono<S>> supplier) {
+
         return supplier.get();
     }
 
     /**
      * Functional Methods for Supporting {@link Flux} Permanence in Entity Objects
-     * @param supplier
+     * @param supplier r2dbc를 실행하는 supplier
      * @return repository result {@link Flux}
      */
-    public <T> Flux<T> persistenceFlux(Supplier<? extends Flux> supplier) {
+    public <S extends T> Flux<S> persistenceFlux(Supplier<? extends Flux<S>> supplier) {
         return supplier.get();
     }
 }

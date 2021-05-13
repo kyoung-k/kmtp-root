@@ -1,6 +1,7 @@
 package com.kmtp.master.service;
 
 import com.google.gson.Gson;
+import com.kmtp.common.http.ResponseErrorHandler;
 import com.kmtp.master.endpoint.Schedule;
 import com.kmtp.master.persistence.ScheduleEntity;
 import com.kmtp.master.persistence.ScheduleRepository;
@@ -33,12 +34,15 @@ public class ScheduleHandler {
     public Mono<ServerResponse> findById( ServerRequest request ) {
 
         final Long masterId = Long.parseLong( request.pathVariable("masterId") );
-        final Flux<Schedule> scheduleFlux = ScheduleMapper.INSTANCE
-                .entityFluxToApiFlux( scheduleRepository.findByMasterId(masterId) );
 
-        return ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(scheduleFlux, Schedule.class);
+        return ScheduleMapper.INSTANCE
+                .entityFluxToApiFlux( scheduleRepository.findByMasterId(masterId) )
+                .log()
+                .collectList()
+                .flatMap(schedules -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(schedules, Schedule.class))
+                .onErrorResume(ResponseErrorHandler::build);
     }
 
     public Mono<ServerResponse> post( ServerRequest request ) {

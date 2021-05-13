@@ -18,13 +18,12 @@ package com.kmtp.master.persistence;
 import com.kmtp.master.endpoint.Member;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 @Repository
 public interface MemberRepository extends ReactiveCrudRepository<MemberEntity, Long> {
 
-    default Mono<ServerResponse> updateMember(Member member) {
+    default Mono<?> updateMember(Member member) {
 
         return this.findById(member.getId())
                 .flatMap(entity -> entity.change(me -> {

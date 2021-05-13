@@ -15,8 +15,6 @@
  */
 package com.kmtp.common.exception;
 
-import lombok.Builder;
-import lombok.Data;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 
@@ -25,26 +23,17 @@ import java.util.stream.Collectors;
 
 public class ValidationErrorHandler {
 
-    @Data
-    @Builder
-    static class Error {
+    public static void build(Errors errors) {
 
-        private String code;
-        private String field;
-        private String message;
-    }
-
-    public static void handle(Errors errors) {
-
-        List<Error> errorList = errors.getFieldErrors().stream()
+        List<ValidationError> errorList = errors.getFieldErrors().stream()
                 .map(ValidationErrorHandler::filedErrorToError)
                 .collect(Collectors.toList());
 
-        throw new ValidationException(errorList, "Kmtp Validation Error.");
+        throw new ValidationException(errorList, "Validation Error.");
     }
 
-    private static Error filedErrorToError(FieldError fieldError) {
-        return Error.builder()
+    private static ValidationError filedErrorToError(FieldError fieldError) {
+        return ValidationError.builder()
                 .code(fieldError.getCode())
                 .field(fieldError.getField())
                 .message(fieldError.getDefaultMessage())

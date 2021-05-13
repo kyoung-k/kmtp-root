@@ -15,18 +15,14 @@
  */
 package com.kmtp.common.exception;
 
-import java.util.List;
+import lombok.Builder;
+import lombok.Data;
 
-public class ValidationException extends RuntimeException {
+@Data
+@Builder
+public class ValidationError {
 
-    final private List<ValidationError> errorsList;
-
-    public ValidationException(List<ValidationError> errorsList, String message) {
-        super(message);
-        this.errorsList = errorsList;
-    }
-
-    public List<ValidationError> getErrorsList() {
-        return errorsList;
-    }
+    private String code;
+    private String field;
+    private String message;
 }

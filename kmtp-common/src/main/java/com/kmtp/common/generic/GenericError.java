@@ -15,7 +15,13 @@
  */
 package com.kmtp.common.generic;
 
-public interface GenericValidate<T> {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 
-    void validate(T api);
+public class GenericError {
+
+    public static <T> Mono<? extends T> of(HttpStatus httpStatus, String message) {
+        return Mono.error(new ResponseStatusException(httpStatus, message));
+    }
 }

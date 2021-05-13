@@ -15,8 +15,8 @@
  */
 package com.kmtp.common.filter;
 
+import com.kmtp.common.http.ResponseErrorHandler;
 import com.kmtp.common.exception.ValidationException;
-import com.kmtp.common.http.HttpErrorInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFilterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -27,7 +27,7 @@ public class FunctionalApiExceptionFilter {
 
     public HandlerFilterFunction<ServerResponse, ServerResponse> exceptionHandler() {
         return (request, next) -> next.handle(request)
-                .onErrorResume(ResponseStatusException.class, HttpErrorInfo::build)
-                .onErrorResume(ValidationException.class, HttpErrorInfo::build);
+                .onErrorResume(ResponseStatusException.class, ResponseErrorHandler::build)
+                .onErrorResume(ValidationException.class, ResponseErrorHandler::build);
     }
 }
