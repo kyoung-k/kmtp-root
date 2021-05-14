@@ -13,19 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.common.http;
+package com.kmtp.reservation.endpoint;
 
-import lombok.Builder;
-import lombok.Data;
-
-import java.time.ZonedDateTime;
-import java.util.List;
-
-@Data
-@Builder
-public class HttpErrorInfo {
-
-    private ZonedDateTime timestamp;
-    private String message;
-    private List<?> error;
+public class Charge {
 }

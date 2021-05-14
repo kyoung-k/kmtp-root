@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.common.http;
+package com.kmtp.reservation.endpoint;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.ZonedDateTime;
-import java.util.List;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
-public class HttpErrorInfo {
+@AllArgsConstructor
+public class Item {
 
-    private ZonedDateTime timestamp;
-    private String message;
-    private List<?> error;
+    private Long id;
+    private Long version;
+    private Long masterId;
+    @NotBlank
+    private String name;
 }

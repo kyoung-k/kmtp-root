@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.common.http;
+package com.kmtp.reservation.service;
 
-import lombok.Builder;
-import lombok.Data;
+import com.kmtp.common.generic.GenericMapper;
+import com.kmtp.reservation.endpoint.Item;
+import com.kmtp.reservation.persistence.ItemEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-import java.time.ZonedDateTime;
-import java.util.List;
+@Mapper(componentModel = "spring")
+public interface ItemMapper extends GenericMapper<Item, ItemEntity> {
 
-@Data
-@Builder
-public class HttpErrorInfo {
-
-    private ZonedDateTime timestamp;
-    private String message;
-    private List<?> error;
+    ItemMapper INSTANCE = Mappers.getMapper( ItemMapper.class );
 }

@@ -22,7 +22,10 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class ResponseErrorHandler {
@@ -37,7 +40,7 @@ public class ResponseErrorHandler {
         Mono<HttpErrorInfo> mono = Mono.just(HttpErrorInfo.builder()
                 .timestamp(ZonedDateTime.now())
                 .message(responseStatusException.getReason())
-                .errors(Collections.emptyList())
+                .error(Collections.emptyList())
                 .build());
 
         return ServerResponse.status(responseStatusException.getStatus().value())
@@ -55,12 +58,12 @@ public class ResponseErrorHandler {
         Mono<HttpErrorInfo> mono = Mono.just(HttpErrorInfo.builder()
                 .timestamp(ZonedDateTime.now())
                 .message(validationException.getMessage())
-                .errors(validationException.getErrorsList())
+                .error(validationException.getErrorsList())
                 .build());
 
         return ServerResponse.status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(mono, HttpInfo.class);
+                .body(mono, HttpErrorInfo.class);
 
     }
 
@@ -77,14 +80,29 @@ public class ResponseErrorHandler {
             return build((ValidationException) throwable);
         }
 
+        throwable.printStackTrace();
+
         Mono<HttpErrorInfo> mono = Mono.just(HttpErrorInfo.builder()
                 .timestamp(ZonedDateTime.now())
                 .message("Internal Server Error")
-                .errors(Collections.emptyList())
+                .error(Collections.emptyList())
                 .build());
 
-        return ServerResponse.status(500)
+        return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(mono, HttpInfo.class);
+                .body(mono, HttpErrorInfo.class);
+    }
+
+    public static Mono<ServerResponse> notFound(String target) {
+
+        Mono<HttpErrorInfo> mono = Mono.just(HttpErrorInfo.builder()
+                .timestamp(ZonedDateTime.now())
+                .message(String.format("not found %s", target))
+                .error(Collections.emptyList())
+                .build());
+
+        return ServerResponse.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(mono, HttpErrorInfo.class);
     }
 }

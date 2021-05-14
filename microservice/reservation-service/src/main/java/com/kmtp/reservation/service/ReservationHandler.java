@@ -1,4 +1,4 @@
-package com.kmtp.reservation.endpoint;
+package com.kmtp.reservation.service;
 
 import com.kmtp.reservation.persistence.ReservationEntity;
 import com.kmtp.reservation.persistence.ReservationRepository;

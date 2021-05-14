@@ -1,5 +1,8 @@
 package com.kmtp.reservation.endpoint;
 
+import com.kmtp.common.filter.FunctionalApiExceptionFilter;
+import com.kmtp.common.http.ResponseErrorHandler;
+import com.kmtp.reservation.service.ItemHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,16 +14,21 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class ItemRouter {
 
     private ItemHandler itemHandler;
+    private FunctionalApiExceptionFilter functionalApiExceptionFilter;
 
     @Autowired
-    public ItemRouter(ItemHandler itemHandler) {
+    public ItemRouter(ItemHandler itemHandler, FunctionalApiExceptionFilter functionalApiExceptionFilter) {
         this.itemHandler = itemHandler;
+        this.functionalApiExceptionFilter = functionalApiExceptionFilter;
     }
 
     @Bean
     public RouterFunction<ServerResponse> itemRoutes() {
         return RouterFunctions.route()
-                .GET("/item/{id}", itemHandler::getItem)
+                .GET("/item", itemHandler::list)
+                .GET("/item/{id}", itemHandler::get)
+                .POST("/item", itemHandler::post)
+                .filter(functionalApiExceptionFilter.exceptionHandler())
                 .build();
     }
 }

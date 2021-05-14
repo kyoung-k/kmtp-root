@@ -15,17 +15,22 @@
  */
 package com.kmtp.common.http;
 
-import lombok.Builder;
-import lombok.Data;
+import com.google.gson.Gson;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import reactor.core.publisher.Mono;
 
-import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
 
-@Data
-@Builder
-public class HttpErrorInfo {
+public class RequestHandler {
 
-    private ZonedDateTime timestamp;
-    private String message;
-    private List<?> error;
+    public static <T> Mono<List<T>> jsonBodyToList(ServerRequest request, Class<T[]> elementClass) {
+
+        return request.bodyToMono(String.class)
+                .flatMap(jsonBody -> {
+                    final Gson gson = new Gson();
+                    final List<T> list = Arrays.asList( gson.fromJson(jsonBody, elementClass) );
+                    return Mono.just(list);
+                });
+    }
 }

@@ -3,6 +3,7 @@ package com.kmtp.reservation.persistence;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -13,6 +14,8 @@ public class ChargeEntity {
 
     @Id
     private Long id;
+    @Version
+    private Long version;
     @Column("item_id")
     private Long itemId;
     @Column("charge")

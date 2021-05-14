@@ -21,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface GenericMapper <D, E> {
 
@@ -44,6 +45,16 @@ public interface GenericMapper <D, E> {
     default Mono<E> apiMonoToEntityMono(Mono<D> apiListMono) {
         return apiListMono
                 .map(this::apiToEntity);
+    }
+
+    default Mono<List<D>> entityListMonoToApiListMono(Mono<List<E>> entityListMono) {
+        return entityListMono
+                .map(this::entityListToApiList);
+    }
+
+    default Mono<List<E>> apiListMonoToEntityListMono(Mono<List<D>> apiListMono) {
+        return apiListMono
+                .map(this::apiListToEntityList);
     }
 
     default Flux<D> entityFluxToApiFlux(Flux<E> entityFlux) {
