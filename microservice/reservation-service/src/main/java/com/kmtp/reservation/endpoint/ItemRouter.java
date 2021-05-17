@@ -28,6 +28,8 @@ public class ItemRouter {
                 .GET("/item", itemHandler::list)
                 .GET("/item/{id}", itemHandler::get)
                 .POST("/item", itemHandler::post)
+                .PUT("/item/{id}", itemHandler::put)
+                .DELETE("/item/{id}", itemHandler::delete)
                 .filter(functionalApiExceptionFilter.exceptionHandler())
                 .build();
     }

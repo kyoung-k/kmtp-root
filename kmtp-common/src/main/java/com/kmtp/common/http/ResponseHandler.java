@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -36,16 +37,28 @@ public class ResponseHandler {
         }
     }
 
-    public static <T> Mono<ServerResponse> ok(Mono<T> mono) {
+    public static <T> Mono<ServerResponse> ok(Mono<? extends T> mono) {
 
-        return mono.map(t -> HttpInfo.builder()
+        return mono.map(t -> Mono.just(HttpInfo.builder()
                         .timestamp(ZonedDateTime.now())
                         .message("success")
                         .data(setData(t))
-                        .build())
+                        .build()))
                 .flatMap(response -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(response, HttpInfo.class))
+                .onErrorResume(ResponseErrorHandler::build);
+    }
+
+    public static <T> Mono<ServerResponse> created(Mono<? extends T> mono, URI uri) {
+
+        return mono.flatMap(t -> ServerResponse.created(uri).build())
+                .onErrorResume(ResponseErrorHandler::build);
+    }
+
+    public static <T> Mono<ServerResponse> noContent(Mono<? extends T> mono) {
+
+        return mono.flatMap(t -> ServerResponse.noContent().build())
                 .onErrorResume(ResponseErrorHandler::build);
     }
 }

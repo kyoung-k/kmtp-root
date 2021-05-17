@@ -42,7 +42,7 @@ public class MasterRouter {
         return RouterFunctions.route()
                 .GET("/master/{id}", masterHandler::get)
                 .POST("/master", masterHandler::post)
-                .PUT("/master", masterHandler::put)
+                .PUT("/master/{id}", masterHandler::put)
                 .DELETE("/master/{id}", masterHandler::delete)
                 .filter(functionalApiExceptionFilter.exceptionHandler())
                 .build();

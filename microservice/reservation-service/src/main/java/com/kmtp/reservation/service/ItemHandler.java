@@ -49,22 +49,59 @@ public class ItemHandler {
                 .map(ItemMapper.INSTANCE::entityToApi)
                 .collectList();
 
-        return ResponseHandler.ok(itemList);
+        return ResponseHandler.ok(itemList);기영씨 알라뷰
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
-        return ok().contentType(MediaType.APPLICATION_JSON)
-                .body(itemRepository.findById(1l), ItemEntity.class);
+
+        final Long id = Long.parseLong(request.pathVariable("id"));
+
+        Mono<Item> itemMono = itemRepository.findById(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id."))
+                .map(ItemMapper.INSTANCE::entityToApi);
+
+        return ResponseHandler.ok(itemMono);
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {
 
-        return request.bodyToMono(Item.class)
+        Mono<ItemEntity> saveItemMono = request.bodyToMono(Item.class)
                 .doOnNext(item -> genericValidator.validate(item, Item.class))
                 .map(ItemMapper.INSTANCE::apiToEntity)
-                .flatMap(itemRepository::save)
-                .flatMap(itemEntity -> ServerResponse
-                        .created(URI.create(request.path()))
-                        .build());
+                .flatMap(itemRepository::save);
+
+        return ResponseHandler.created(saveItemMono, URI.create(request.path()));
+    }
+
+    public Mono<ServerResponse> put(ServerRequest request) {
+
+        final Long id = Long.parseLong(request.pathVariable("id"));
+        final Mono<Item> itemMono = request.bodyToMono(Item.class)
+                .doOnNext(item -> genericValidator.validate(item, Item.class));
+
+        final Mono<ItemEntity> itemEntityMono = itemRepository.findById(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id"));
+
+        Mono<ItemEntity> updateItemMono = Mono.zip(itemMono, itemEntityMono)
+                .flatMap(tuple2 -> {
+
+                    tuple2.getT2().setName(tuple2.getT1().getName());
+
+                    return Mono.just(tuple2.getT2())
+                            .flatMap(itemRepository::save);
+                });
+
+        return ResponseHandler.noContent(updateItemMono);
+    }
+
+    public Mono<ServerResponse> delete(ServerRequest request) {
+
+        final Long id = Long.parseLong(request.pathVariable("id"));
+
+        final Mono<Void> itemMono = itemRepository.findById(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id."))
+                .then(itemRepository.deleteById(id));
+
+        return ResponseHandler.noContent(itemMono);
     }
 }

@@ -18,7 +18,11 @@ package com.kmtp.master.service;
 import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.ResponseErrorHandler;
+import com.kmtp.common.http.ResponseHandler;
+import com.kmtp.master.endpoint.Master;
 import com.kmtp.master.endpoint.Member;
+import com.kmtp.master.persistence.MasterEntity;
+import com.kmtp.master.persistence.MemberEntity;
 import com.kmtp.master.persistence.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,45 +50,59 @@ public class MemberHandler {
 
         final Long id = Long.parseLong( request.pathVariable("id") );
 
-        return memberRepository.findById(id)
+        final Mono<Member> memberMono = memberRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found member-id."))
-                .map(MemberMapper.INSTANCE::entityToApi)
-                .flatMap(member -> ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(member, Member.class))
-                .onErrorResume(ResponseErrorHandler::build);
+                .map(MemberMapper.INSTANCE::entityToApi);
+
+        return ResponseHandler.ok(memberMono);
 
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {
 
-        return request.bodyToMono(Member.class)
+        Mono<MemberEntity> saveMemberMono = request.bodyToMono(Member.class)
                 .doOnNext(member -> genericValidator.validate(member, Member.class))
                 .map(MemberMapper.INSTANCE::apiToEntity)
-                .flatMap(memberRepository::save)
-                .flatMap(result -> ServerResponse
-                    .created(URI.create(request.path()))
-                    .build())
-                .onErrorResume(ResponseErrorHandler::build);
+                .flatMap(memberRepository::save);
+
+        return ResponseHandler.created(saveMemberMono, URI.create(request.path()));
     }
 
     public Mono<ServerResponse> put(ServerRequest request) {
 
-        return request.bodyToMono(Member.class)
-                .doOnNext(member -> genericValidator.validate(member, Member.class))
-                .flatMap(memberRepository::updateMember)
-                .flatMap(result -> ServerResponse.noContent().build())
-                .onErrorResume(ResponseErrorHandler::build);
+        final Long id = Long.parseLong(request.pathVariable("id"));
+        final Mono<Member> memberMono = request.bodyToMono(Member.class)
+                .doOnNext(member -> genericValidator.validate(member, Member.class));
+
+        final Mono<MemberEntity> memberEntityMono = memberRepository.findById(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id"));
+
+        Mono<MemberEntity> updateMemberMono = Mono.zip(memberMono, memberEntityMono)
+                .flatMap(tuple2 -> {
+
+                    tuple2.getT2().change(memberEntity -> {
+
+                        memberEntity.setEmail(tuple2.getT1().getEmail());
+                        memberEntity.setName(tuple2.getT1().getName());
+                        memberEntity.setAge(tuple2.getT1().getAge());
+                        memberEntity.setAddress(tuple2.getT1().getAddress());
+                    });
+
+                    return Mono.just(tuple2.getT2())
+                            .flatMap(memberRepository::save);
+                });
+
+        return ResponseHandler.noContent(updateMemberMono);
     }
 
     public Mono<ServerResponse> delete(ServerRequest request) {
 
         final Long id = Long.parseLong( request.pathVariable("id") );
 
-        return memberRepository.findById(id)
+        Mono<Void> deleteMemberMono = memberRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found member-id."))
-                .flatMap(memberEntity -> ServerResponse.ok()
-                        .build(memberRepository.deleteById(id)))
-                .onErrorResume(ResponseErrorHandler::build);
+                .then(memberRepository.deleteById(id));
+
+        return ResponseHandler.noContent(deleteMemberMono);
     }
 }
