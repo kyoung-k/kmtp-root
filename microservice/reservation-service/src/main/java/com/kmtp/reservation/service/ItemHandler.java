@@ -49,7 +49,7 @@ public class ItemHandler {
                 .map(ItemMapper.INSTANCE::entityToApi)
                 .collectList();
 
-        return ResponseHandler.ok(itemList);기영씨 알라뷰
+        return ResponseHandler.ok(itemList)
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
