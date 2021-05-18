@@ -28,7 +28,6 @@ import javax.validation.constraints.NotNull;
 public class Item {
 
     private Long id;
-    private Long version;
     @NotNull
     private Long masterId;
     @NotBlank

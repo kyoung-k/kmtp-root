@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -45,9 +46,20 @@ public class ItemHandler {
 
         final Mono<List<Item>> itemList = masterIdMono
                 .switchIfEmpty(GenericError.of(HttpStatus.BAD_REQUEST, "query param master-id is required."))
-                .flatMapMany(itemRepository::findByMasterId)
-                .map(ItemMapper.INSTANCE::entityToApi)
-                .collectList();
+                .flatMapMany(masterId -> {
+
+                    final Flux<Item> itemFlux = itemRepository.findByMasterId(masterId)
+                            .map(ItemMapper.INSTANCE::entityToApi);
+
+                    final Flux<Charge> chargeFlux = chargeRepository.findByMasterId(masterId)
+                            .map(ChargeMapper.INSTANCE::entityToApi);
+
+                    return Flux.zip(itemFlux, chargeFlux)
+                            .flatMap(tuple2 -> {
+                                tuple2.getT1().setCharge(tuple2.getT2());
+                                return Mono.just(tuple2.getT1());
+                            });
+                }).collectList();
 
         return ResponseHandler.ok(itemList);
     }
@@ -60,7 +72,17 @@ public class ItemHandler {
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id."))
                 .map(ItemMapper.INSTANCE::entityToApi);
 
-        return ResponseHandler.ok(itemMono);
+        final Mono<Charge> chargeMono = chargeRepository.findByItemId(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item charge."))
+                .map(ChargeMapper.INSTANCE::entityToApi);
+
+        final Mono<Item> responseMono = Mono.zip(itemMono, chargeMono)
+                .flatMap(tuple2 -> {
+                    tuple2.getT1().setCharge(tuple2.getT2());
+                    return Mono.just(tuple2.getT1());
+                });
+
+        return ResponseHandler.ok(responseMono);
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {
@@ -78,7 +100,9 @@ public class ItemHandler {
                 .flatMap(tuple2 -> itemRepository.save(ItemMapper.INSTANCE.apiToEntity(tuple2.getT1()))
                         .flatMap(itemEntity -> {
 
+                            tuple2.getT2().setMasterId(itemEntity.getMasterId());
                             tuple2.getT2().setItemId(itemEntity.getId());
+
                             return chargeRepository.save(ChargeMapper.INSTANCE.apiToEntity(tuple2.getT2()));
                         }));
 
@@ -89,15 +113,25 @@ public class ItemHandler {
 
         final Long id = Long.parseLong(request.pathVariable("id"));
         final Mono<Item> itemMono = request.bodyToMono(Item.class)
-                .doOnNext(item -> genericValidator.validate(item, Item.class));
+                .doOnNext(item -> genericValidator.validate(item, Item.class))
+                .doOnNext(item -> genericValidator.validate(item.getCharge(), Charge.class));
 
         final Mono<ItemEntity> itemEntityMono = itemRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id"));
 
-        final Mono<ItemEntity> updateItemMono = Mono.zip(itemMono, itemEntityMono)
-                .doOnNext(tuple2 -> tuple2.getT2()
-                        .change(itemEntity -> itemEntity.setName(tuple2.getT1().getName())))
-                .flatMap(tuple2 -> itemRepository.save(tuple2.getT2()));
+        final Mono<ChargeEntity> chargeEntityMono = chargeRepository.findByItemId(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item charge."));
+
+        final Mono<?> updateItemMono = Mono.zip(itemMono, itemEntityMono, chargeEntityMono)
+                .doOnNext(tuple3 -> tuple3.getT2()
+                        .change(itemEntity -> itemEntity.setName(tuple3.getT1().getName())))
+                .doOnNext(tuple3 -> tuple3.getT3()
+                        .change(chargeEntity -> {
+                            chargeEntity.setCharge(tuple3.getT1().getCharge().getCharge());
+                            chargeEntity.setName(tuple3.getT1().getCharge().getName());
+                        }))
+                .flatMap(tuple3 -> itemRepository.save(tuple3.getT2())
+                        .then(chargeRepository.save(tuple3.getT3())));
 
         return ResponseHandler.noContent(updateItemMono);
     }
@@ -106,10 +140,14 @@ public class ItemHandler {
 
         final Long id = Long.parseLong(request.pathVariable("id"));
 
+        final Mono<Void> chargeMono = chargeRepository.findByItemId(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item charge."))
+                .then(chargeRepository.deleteByItemId(id));
+
         final Mono<Void> itemMono = itemRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id."))
                 .then(itemRepository.deleteById(id));
 
-        return ResponseHandler.noContent(itemMono);
+        return ResponseHandler.noContent(Mono.zip(chargeMono, itemMono));
     }
 }

@@ -4,6 +4,7 @@ create table charges
     id      bigint auto_increment
         primary key,
     version int,
+    master_id bigint    not null,
     item_id bigint       not null,
     name    varchar(100) null,
     charge  bigint       null

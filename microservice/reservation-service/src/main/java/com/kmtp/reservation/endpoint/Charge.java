@@ -28,6 +28,7 @@ import javax.validation.constraints.NotNull;
 public class Charge {
 
     private Long id;
+    private Long masterId;
     private Long itemId;
     @NotNull
     private Long charge;
