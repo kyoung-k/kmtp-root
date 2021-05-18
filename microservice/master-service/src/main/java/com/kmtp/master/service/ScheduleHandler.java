@@ -32,7 +32,7 @@ public class ScheduleHandler {
         final Long masterId = Long.parseLong( request.pathVariable("masterId") );
 
         Mono<List<Schedule>> monoList = ScheduleMapper.INSTANCE
-                .entityFluxToApiFlux( scheduleRepository.findByMasterId(masterId) )
+                .entityFluxToApiFlux(scheduleRepository.findByMasterId(masterId))
                 .collectList();
 
         return ResponseHandler.ok(monoList);
@@ -40,13 +40,11 @@ public class ScheduleHandler {
 
     public Mono<ServerResponse> post( ServerRequest request ) {
 
-        return RequestHandler.jsonBodyToList(request, Schedule[].class)
+        final Mono<List<ScheduleEntity>> listMono = RequestHandler.jsonBodyToList(request, Schedule[].class)
                 .map(ScheduleMapper.INSTANCE::apiListToEntityList)
-                .doOnNext(scheduleRepository::saveAll)
-                .then(ServerResponse
-                        .created(URI.create(request.path()))
-                        .build())
-                .onErrorResume(ResponseErrorHandler::build);
+                .flatMap(scheduleEntities -> scheduleRepository.saveAll(scheduleEntities).collectList());
+
+        return ResponseHandler.created(listMono, URI.create(request.path()));
     }
 
     public Mono<ServerResponse> put( ServerRequest request ) {
@@ -67,10 +65,8 @@ public class ScheduleHandler {
                     List<ScheduleEntity> scheduleEntityList =
                             ScheduleMapper.INSTANCE.apiListToEntityList(tuple2.getT2());
 
-                    return scheduleRepository.saveAll(scheduleEntityList)
-                            .then(ServerResponse.noContent().build());
-                })
-                .onErrorResume(ResponseErrorHandler::build);
+                    return ResponseHandler.noContent(scheduleRepository.saveAll(scheduleEntityList).collectList());
+                });
     }
 
     public Mono<ServerResponse> delete(ServerRequest request) {
@@ -80,12 +76,10 @@ public class ScheduleHandler {
         return scheduleRepository.countByMasterId(masterId)
                 .flatMap(count -> {
 
-                    if (count <= 0) {
+                    if (count <= 0)
                         return ResponseErrorHandler.notFound("master-id");
-                    }
 
-                    return scheduleRepository.deleteByMasterId(masterId)
-                            .then(ServerResponse.noContent().build());
+                    return ResponseHandler.noContent(scheduleRepository.deleteByMasterId(masterId));
                 });
     }
 }

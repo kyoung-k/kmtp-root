@@ -1,3 +1,4 @@
+drop table charges;
 create table charges
 (
     id      bigint auto_increment
@@ -8,6 +9,7 @@ create table charges
     charge  bigint       null
 );
 
+drop table discounts;
 create table discounts
 (
     id        bigint auto_increment
@@ -17,14 +19,17 @@ create table discounts
     discounts double       null
 );
 
+drop table goods;
 create table goods
 (
     id        bigint auto_increment
         primary key,
+    version int,
     master_id bigint       not null,
     name      varchar(100) null
 );
 
+drop table itemgoods;
 create table itemgoods
 (
     id       bigint auto_increment
@@ -33,6 +38,7 @@ create table itemgoods
     goods_id bigint not null
 );
 
+drop table items;
 create table items
 (
     id        bigint auto_increment
@@ -42,6 +48,7 @@ create table items
     name      varchar(100) null
 );
 
+drop table masters;
 create table masters
 (
     id          bigint auto_increment
@@ -51,6 +58,7 @@ create table masters
     information varchar(500) null
 );
 
+drop table members;
 create table members
 (
     id      bigint auto_increment
@@ -62,6 +70,7 @@ create table members
     address varchar(100)     null
 );
 
+drop table reservations;
 create table reservations
 (
     id                 bigint auto_increment
@@ -75,6 +84,7 @@ create table reservations
     reservation_charge double not null
 );
 
+drop table schedules;
 create table schedules
 (
     id         bigint auto_increment
@@ -84,5 +94,3 @@ create table schedules
     start_time varchar(20) null,
     end_time   varchar(20) null
 );
-
-

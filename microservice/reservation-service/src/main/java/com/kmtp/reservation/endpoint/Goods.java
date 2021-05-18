@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.master.persistence;
+package com.kmtp.reservation.endpoint;
 
-import com.kmtp.master.endpoint.Member;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-@Repository
-public interface MemberRepository extends ReactiveCrudRepository<MemberEntity, Long> {
+import javax.validation.constraints.NotBlank;
 
+@Data
+@Builder
+@AllArgsConstructor
+public class Goods {
+
+    private Long id;
+    private Long masterId;
+    @NotBlank
+    private String name;
 }

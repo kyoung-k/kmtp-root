@@ -2,13 +2,8 @@ server:
   port: 8881
 
 spring.r2dbc:
-  url: r2dbc:mysql://localhost:3306/kmtp?useUnicode=true&characterEncoding=utf8
+  url: r2dbc:mysql://10.144.243.80:3306/kmtp?useUnicode=true&characterEncoding=utf8
   username: kyoung
   password: password
 
-logging:
-  level:
-    org:
-      springframework:
-        data:
-          r2dbc: DEBUG
+logging.level.org.springframework.data.r2dbc: DEBUG

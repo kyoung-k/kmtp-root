@@ -1,5 +1,7 @@
 package com.kmtp.reservation.persistence;
 
+import com.kmtp.common.generic.GenericEntity;
+import com.kmtp.reservation.endpoint.Item;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @Table("items")
 @AllArgsConstructor
-public class ItemEntity {
+public class ItemEntity extends GenericEntity<ItemEntity> {
 
     @Id
     private Long id;

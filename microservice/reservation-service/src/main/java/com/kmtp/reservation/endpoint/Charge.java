@@ -15,5 +15,22 @@
  */
 package com.kmtp.reservation.endpoint;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Data
+@Builder
+@AllArgsConstructor
 public class Charge {
+
+    private Long id;
+    private Long itemId;
+    @NotNull
+    private Long charge;
+    @NotEmpty
+    private String name;
 }

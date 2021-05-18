@@ -19,9 +19,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class GenericEntity <T> {
+public abstract class GenericEntity<T> {
 
     /**
      * Functions used in PUT API
@@ -31,6 +32,11 @@ public abstract class GenericEntity <T> {
     public T change(Consumer<T> consumer) {
         consumer.accept((T) this);
         return (T) this;
+    }
+
+    public Mono<T> persistenceMono(Consumer<T> consumer) {
+        consumer.accept((T) this);
+        return Mono.just((T) this);
     }
 
     /**

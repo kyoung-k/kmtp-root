@@ -20,6 +20,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
@@ -28,7 +29,10 @@ public class Item {
 
     private Long id;
     private Long version;
+    @NotNull
     private Long masterId;
     @NotBlank
     private String name;
+    @NotNull
+    private Charge charge;
 }

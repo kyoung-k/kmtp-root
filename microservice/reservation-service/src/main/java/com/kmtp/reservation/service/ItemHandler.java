@@ -4,11 +4,9 @@ import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.ResponseErrorHandler;
 import com.kmtp.common.http.ResponseHandler;
+import com.kmtp.reservation.endpoint.Charge;
 import com.kmtp.reservation.endpoint.Item;
-import com.kmtp.reservation.persistence.ItemEntity;
-import com.kmtp.reservation.persistence.ItemRepository;
-import com.kmtp.reservation.persistence.ReservationEntity;
-import com.kmtp.reservation.persistence.ReservationRepository;
+import com.kmtp.reservation.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,11 +26,13 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 public class ItemHandler {
 
     private ItemRepository itemRepository;
+    private ChargeRepository chargeRepository;
     private GenericValidator genericValidator;
 
     @Autowired
-    public ItemHandler(ItemRepository itemRepository, GenericValidator genericValidator) {
+    public ItemHandler(ItemRepository itemRepository, ChargeRepository chargeRepository, GenericValidator genericValidator) {
         this.itemRepository = itemRepository;
+        this.chargeRepository = chargeRepository;
         this.genericValidator = genericValidator;
     }
 
@@ -43,20 +43,20 @@ public class ItemHandler {
                 .map(Mono::just)
                 .orElseGet(Mono::empty);
 
-        Mono<List<Item>> itemList = masterIdMono
+        final Mono<List<Item>> itemList = masterIdMono
                 .switchIfEmpty(GenericError.of(HttpStatus.BAD_REQUEST, "query param master-id is required."))
                 .flatMapMany(itemRepository::findByMasterId)
                 .map(ItemMapper.INSTANCE::entityToApi)
                 .collectList();
 
-        return ResponseHandler.ok(itemList)
+        return ResponseHandler.ok(itemList);
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
 
         final Long id = Long.parseLong(request.pathVariable("id"));
 
-        Mono<Item> itemMono = itemRepository.findById(id)
+        final Mono<Item> itemMono = itemRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id."))
                 .map(ItemMapper.INSTANCE::entityToApi);
 
@@ -65,10 +65,22 @@ public class ItemHandler {
 
     public Mono<ServerResponse> post(ServerRequest request) {
 
-        Mono<ItemEntity> saveItemMono = request.bodyToMono(Item.class)
+        final Mono<ChargeEntity> saveItemMono = request.bodyToMono(Item.class)
                 .doOnNext(item -> genericValidator.validate(item, Item.class))
-                .map(ItemMapper.INSTANCE::apiToEntity)
-                .flatMap(itemRepository::save);
+                .doOnNext(item -> genericValidator.validate(item.getCharge(), Charge.class))
+                .flatMap(item -> {
+
+                    final Mono<Item> itemMono = Mono.just(item);
+                    final Mono<Charge> chargeMono = Mono.just(item.getCharge());
+
+                    return Mono.zip(itemMono, chargeMono);
+                })
+                .flatMap(tuple2 -> itemRepository.save(ItemMapper.INSTANCE.apiToEntity(tuple2.getT1()))
+                        .flatMap(itemEntity -> {
+
+                            tuple2.getT2().setItemId(itemEntity.getId());
+                            return chargeRepository.save(ChargeMapper.INSTANCE.apiToEntity(tuple2.getT2()));
+                        }));
 
         return ResponseHandler.created(saveItemMono, URI.create(request.path()));
     }
@@ -82,14 +94,10 @@ public class ItemHandler {
         final Mono<ItemEntity> itemEntityMono = itemRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id"));
 
-        Mono<ItemEntity> updateItemMono = Mono.zip(itemMono, itemEntityMono)
-                .flatMap(tuple2 -> {
-
-                    tuple2.getT2().setName(tuple2.getT1().getName());
-
-                    return Mono.just(tuple2.getT2())
-                            .flatMap(itemRepository::save);
-                });
+        final Mono<ItemEntity> updateItemMono = Mono.zip(itemMono, itemEntityMono)
+                .doOnNext(tuple2 -> tuple2.getT2()
+                        .change(itemEntity -> itemEntity.setName(tuple2.getT1().getName())))
+                .flatMap(tuple2 -> itemRepository.save(tuple2.getT2()));
 
         return ResponseHandler.noContent(updateItemMono);
     }

@@ -60,12 +60,12 @@ public class MemberHandler {
 
     public Mono<ServerResponse> post(ServerRequest request) {
 
-        Mono<MemberEntity> saveMemberMono = request.bodyToMono(Member.class)
+        final Mono<MemberEntity> memberEntityMono = request.bodyToMono(Member.class)
                 .doOnNext(member -> genericValidator.validate(member, Member.class))
                 .map(MemberMapper.INSTANCE::apiToEntity)
                 .flatMap(memberRepository::save);
 
-        return ResponseHandler.created(saveMemberMono, URI.create(request.path()));
+        return ResponseHandler.created(memberEntityMono, URI.create(request.path()));
     }
 
     public Mono<ServerResponse> put(ServerRequest request) {
@@ -77,7 +77,7 @@ public class MemberHandler {
         final Mono<MemberEntity> memberEntityMono = memberRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id"));
 
-        Mono<MemberEntity> updateMemberMono = Mono.zip(memberMono, memberEntityMono)
+        final Mono<MemberEntity> updateMemberMono = Mono.zip(memberMono, memberEntityMono)
                 .flatMap(tuple2 -> {
 
                     tuple2.getT2().change(memberEntity -> {
@@ -99,7 +99,7 @@ public class MemberHandler {
 
         final Long id = Long.parseLong( request.pathVariable("id") );
 
-        Mono<Void> deleteMemberMono = memberRepository.findById(id)
+        final Mono<Void> deleteMemberMono = memberRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found member-id."))
                 .then(memberRepository.deleteById(id));
 

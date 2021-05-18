@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.master.persistence;
+package com.kmtp.reservation.service;
 
-import com.kmtp.master.endpoint.Member;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
+import com.kmtp.common.generic.GenericMapper;
+import com.kmtp.reservation.endpoint.Charge;
+import com.kmtp.reservation.persistence.ChargeEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Repository
-public interface MemberRepository extends ReactiveCrudRepository<MemberEntity, Long> {
+@Mapper(componentModel = "spring")
+public interface ChargeMapper extends GenericMapper<Charge, ChargeEntity> {
 
+    ChargeMapper INSTANCE = Mappers.getMapper( ChargeMapper.class );
 }
