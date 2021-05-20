@@ -4,11 +4,9 @@ import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.RequestHandler;
 import com.kmtp.common.http.ResponseHandler;
+import com.kmtp.reservation.endpoint.Discount;
 import com.kmtp.reservation.endpoint.Goods;
-import com.kmtp.reservation.persistence.GoodsEntity;
-import com.kmtp.reservation.persistence.GoodsRepository;
-import com.kmtp.reservation.persistence.ItemEntity;
-import com.kmtp.reservation.persistence.ItemRepository;
+import com.kmtp.reservation.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.relational.core.sql.Not;
 import org.springframework.http.HttpStatus;
@@ -27,11 +25,15 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 public class GoodsHandler {
 
     private GoodsRepository goodsRepository;
+    private DiscountRepository discountRepository;
     private GenericValidator genericValidator;
 
     @Autowired
-    public GoodsHandler(GoodsRepository goodsRepository, GenericValidator genericValidator) {
+    public GoodsHandler(GoodsRepository goodsRepository
+            , DiscountRepository discountRepository, GenericValidator genericValidator) {
+
         this.goodsRepository = goodsRepository;
+        this.discountRepository = discountRepository;
         this.genericValidator = genericValidator;
     }
 
@@ -64,10 +66,24 @@ public class GoodsHandler {
 
     public Mono<ServerResponse> post(ServerRequest request) {
 
-        final Mono<GoodsEntity> goodsEntityMono = request.bodyToMono(Goods.class)
+        final Mono<DiscountEntity> goodsEntityMono = request.bodyToMono(Goods.class)
                 .doOnNext(goods -> genericValidator.validate(goods, Goods.class))
-                .map(GoodsMapper.INSTANCE::apiToEntity)
-                .flatMap(goodsRepository::save);
+                .doOnNext(goods -> genericValidator.validate(goods.getDiscount(), Discount.class))
+                .flatMap(goods -> {
+
+                    final Mono<Goods> goodsMono = Mono.just(goods);
+                    final Mono<Discount> discountMono = Mono.just(goods.getDiscount());
+
+                    return Mono.zip(goodsMono, discountMono);
+                })
+                .flatMap(tuple2 -> goodsRepository.save(GoodsMapper.INSTANCE.apiToEntity(tuple2.getT1()))
+                        .flatMap(goodsEntity -> {
+
+                            tuple2.getT2().setMasterId(goodsEntity.getMasterId());
+                            tuple2.getT2().setGoodsId(goodsEntity.getId());
+
+                            return discountRepository.save(DiscountMapper.INSTANCE.apiToEntity(tuple2.getT2()));
+                        }));
 
         return ResponseHandler.created(goodsEntityMono, URI.create(request.path()));
     }

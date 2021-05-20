@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.reservation.endpoint;
+package com.kmtp.reservation.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import com.kmtp.common.generic.GenericMapper;
+import com.kmtp.reservation.endpoint.Discount;
+import com.kmtp.reservation.persistence.DiscountEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+@Mapper(componentModel = "spring")
+public interface DiscountMapper extends GenericMapper<Discount, DiscountEntity> {
 
-@Data
-@Builder
-@AllArgsConstructor
-public class Goods {
-
-    private Long id;
-    private Long masterId;
-    @NotBlank
-    private String name;
-    @NotNull
-    private Discount discount;
+    DiscountMapper INSTANCE = Mappers.getMapper( DiscountMapper.class );
 }

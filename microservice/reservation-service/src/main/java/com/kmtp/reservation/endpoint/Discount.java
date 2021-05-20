@@ -19,18 +19,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class Goods {
+public class Discount {
 
     private Long id;
     private Long masterId;
-    @NotBlank
-    private String name;
+    private Long goodsId;
     @NotNull
-    private Discount discount;
+    private Double discount;
+    @NotEmpty
+    private String name;
 }

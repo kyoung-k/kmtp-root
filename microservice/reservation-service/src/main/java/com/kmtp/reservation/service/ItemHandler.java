@@ -31,7 +31,9 @@ public class ItemHandler {
     private GenericValidator genericValidator;
 
     @Autowired
-    public ItemHandler(ItemRepository itemRepository, ChargeRepository chargeRepository, GenericValidator genericValidator) {
+    public ItemHandler(ItemRepository itemRepository
+            , ChargeRepository chargeRepository, GenericValidator genericValidator) {
+
         this.itemRepository = itemRepository;
         this.chargeRepository = chargeRepository;
         this.genericValidator = genericValidator;

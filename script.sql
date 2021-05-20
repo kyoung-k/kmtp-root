@@ -1,10 +1,19 @@
+-- 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
+select * from masters;
+select * from schedules;
+select * from items;
+select * from goods;
+select * from discounts;
+select * from members;
+
+
 drop table charges;
 create table charges
 (
     id      bigint auto_increment
         primary key,
     version int,
-    master_id bigint    not null,
+    master_id bigint     not null,
     item_id bigint       not null,
     name    varchar(100) null,
     charge  bigint       null
@@ -15,9 +24,11 @@ create table discounts
 (
     id        bigint auto_increment
         primary key,
+    version int,
+    master_id bigint       not null,
     goods_id  bigint       not null,
     name      varchar(100) null,
-    discounts double       null
+    discount double  null
 );
 
 drop table goods;
