@@ -1,17 +1,25 @@
 package com.kmtp.master.service;
 
+import com.kmtp.common.generic.GenericError;
+import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.RequestHandler;
 import com.kmtp.common.http.ResponseErrorHandler;
 import com.kmtp.common.http.ResponseHandler;
+import com.kmtp.master.endpoint.Master;
 import com.kmtp.master.endpoint.Schedule;
+import com.kmtp.master.persistence.MasterRepository;
 import com.kmtp.master.persistence.ScheduleEntity;
 import com.kmtp.master.persistence.ScheduleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.net.URI;
 import java.util.List;
@@ -21,65 +29,61 @@ import java.util.List;
 public class ScheduleHandler {
 
     final private ScheduleRepository scheduleRepository;
+    final private MasterRepository masterRepository;
+    final private GenericValidator genericValidator;
 
     @Autowired
-    public ScheduleHandler(ScheduleRepository scheduleRepository) {
+    public ScheduleHandler(ScheduleRepository scheduleRepository
+            , MasterRepository masterRepository
+            , GenericValidator genericValidator) {
+
         this.scheduleRepository = scheduleRepository;
+        this.masterRepository = masterRepository;
+        this.genericValidator = genericValidator;
     }
 
     public Mono<ServerResponse> findById( ServerRequest request ) {
 
         final Long masterId = Long.parseLong( request.pathVariable("masterId") );
 
-        Mono<List<Schedule>> monoList = ScheduleMapper.INSTANCE
-                .entityFluxToApiFlux(scheduleRepository.findByMasterId(masterId))
+        Mono<List<Schedule>> listMono = scheduleRepository.findByMasterId(masterId)
+                .map(ScheduleMapper.INSTANCE::entityToApi)
                 .collectList();
 
-        return ResponseHandler.ok(monoList);
+        return ResponseHandler.ok(listMono);
     }
 
     public Mono<ServerResponse> post( ServerRequest request ) {
 
+        final Mono<Master> masterMono = Mono.just(request.pathVariable("masterId"))
+                .map(Long::parseLong)
+                .flatMap(masterRepository::findById)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found master."))
+                .map(MasterMapper.INSTANCE::entityToApi);
+
         final Mono<List<ScheduleEntity>> listMono = RequestHandler.jsonBodyToList(request, Schedule[].class)
-                .map(ScheduleMapper.INSTANCE::apiListToEntityList)
-                .flatMap(scheduleEntities -> scheduleRepository.saveAll(scheduleEntities).collectList());
-
-        return ResponseHandler.created(listMono, URI.create(request.path()));
-    }
-
-    public Mono<ServerResponse> put( ServerRequest request ) {
-
-        final Long masterId = Long.parseLong( request.pathVariable("masterId") );
-        final Mono<Long> count = scheduleRepository.countByMasterId( masterId );
-        final Mono<List<Schedule>> scheduleList = RequestHandler.jsonBodyToList(request, Schedule[].class);
-
-        return Mono.zip(count, scheduleList)
+                .doOnNext(schedules -> genericValidator.validateList(schedules, Schedule.class))
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(schedule -> masterMono.map(master -> Tuples.of(schedule, master)))
                 .flatMap(tuple2 -> {
 
-                    if (tuple2.getT1() <= 0)
-                        return ResponseErrorHandler.notFound("master-id");
+                    tuple2.getT1().setMasterId(tuple2.getT2().getId());
 
-                    scheduleRepository.deleteByMasterId(masterId)
-                            .subscribe();
+                    return scheduleRepository.deleteByMasterId(tuple2.getT2().getId())
+                            .then(scheduleRepository.save(ScheduleMapper.INSTANCE.apiToEntity(tuple2.getT1())));
+                }).collectList();
 
-                    List<ScheduleEntity> scheduleEntityList =
-                            ScheduleMapper.INSTANCE.apiListToEntityList(tuple2.getT2());
-
-                    return ResponseHandler.noContent(scheduleRepository.saveAll(scheduleEntityList).collectList());
-                });
+        return ResponseHandler.created(listMono, URI.create(request.path()));
     }
 
     public Mono<ServerResponse> delete(ServerRequest request) {
 
         final Long masterId = Long.parseLong( request.pathVariable("masterId") );
 
-        return scheduleRepository.countByMasterId(masterId)
-                .flatMap(count -> {
+        final Mono<Void> voidMono = scheduleRepository.findByMasterId(masterId)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found schedule."))
+                .then(scheduleRepository.deleteByMasterId(masterId));
 
-                    if (count <= 0)
-                        return ResponseErrorHandler.notFound("master-id");
-
-                    return ResponseHandler.noContent(scheduleRepository.deleteByMasterId(masterId));
-                });
+        return ResponseHandler.noContent(voidMono);
     }
 }

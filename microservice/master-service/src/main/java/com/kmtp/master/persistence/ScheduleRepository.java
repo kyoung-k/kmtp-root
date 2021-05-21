@@ -25,7 +25,5 @@ public interface ScheduleRepository extends ReactiveCrudRepository<ScheduleEntit
 
     Flux<ScheduleEntity> findByMasterId(Long masterId);
 
-    Mono<Long> countByMasterId(Long masterId);
-
-    Mono<ScheduleEntity> deleteByMasterId(Long masterId);
+    Mono<Void> deleteByMasterId(Long masterId);
 }

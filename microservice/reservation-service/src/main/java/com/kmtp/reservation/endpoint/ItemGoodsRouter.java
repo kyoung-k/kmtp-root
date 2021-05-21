@@ -25,10 +25,10 @@ public class ItemGoodsRouter {
     @Bean
     public RouterFunction<ServerResponse> itemGoodsRoutes() {
         return RouterFunctions.route()
-                .GET("/itemGoods", itemGoodsHandler::list)
+                .GET("/itemGoods/item/{itemId}", itemGoodsHandler::itemList)
+                .GET("/itemGoods/goods/{goodsId}", itemGoodsHandler::goodsList)
                 .POST("/itemGoods", itemGoodsHandler::post)
-                .PUT("/itemGoods/{goodsId}", itemGoodsHandler::put)
-                .DELETE("/itemGoods/{id}", itemGoodsHandler::delete)
+                .DELETE("/itemGoods/{goodsId}", itemGoodsHandler::delete)
                 .filter(functionalApiExceptionFilter.exceptionHandler())
                 .build();
     }

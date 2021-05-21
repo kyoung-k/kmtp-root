@@ -39,9 +39,26 @@ public class ItemGoodsHandler {
         this.genericValidator = genericValidator;
     }
 
-    public Mono<ServerResponse> list(ServerRequest request) {
+    public Mono<ServerResponse> itemList(ServerRequest request) {
 
-        return null;
+        final Long itemId = Long.parseLong(request.pathVariable("itemId"));
+
+        Mono<List<ItemGoods>> listMono = itemGoodsRepository.findByItemId(itemId)
+                .map(ItemGoodsMapper.INSTANCE::entityToApi)
+                .collectList();
+
+        return ResponseHandler.ok(listMono);
+    }
+
+    public Mono<ServerResponse> goodsList(ServerRequest request) {
+
+        final Long goodsId = Long.parseLong(request.pathVariable("goodsId"));
+
+        Mono<List<ItemGoods>> listMono = itemGoodsRepository.findByGoodsId(goodsId)
+                .map(ItemGoodsMapper.INSTANCE::entityToApi)
+                .collectList();
+
+        return ResponseHandler.ok(listMono);
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {
@@ -52,10 +69,10 @@ public class ItemGoodsHandler {
                 .flatMap(itemGoods -> {
 
                     final Mono<ItemEntity> itemEntityMono = itemRepository.findById(itemGoods.getItemId())
-                            .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id."));
+                            .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item."));
 
                     final Mono<GoodsEntity> goodsEntityMono = goodsRepository.findById(itemGoods.getGoodsId())
-                            .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods-id."));
+                            .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods."));
 
                     return Mono.zip(itemEntityMono, goodsEntityMono);
                 })
@@ -73,13 +90,14 @@ public class ItemGoodsHandler {
         return ResponseHandler.created(listMono, URI.create(request.path()));
     }
 
-    public Mono<ServerResponse> put(ServerRequest request) {
-
-        return null;
-    }
-
     public Mono<ServerResponse> delete(ServerRequest request) {
 
-        return null;
+        final Long goodsId = Long.parseLong(request.pathVariable("goodsId"));
+
+        Mono<Void> voidMono = itemGoodsRepository.findByGoodsId(goodsId)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found itemgoods."))
+                .then(itemGoodsRepository.deleteByGoodsId(goodsId));
+
+        return ResponseHandler.noContent(voidMono);
     }
 }

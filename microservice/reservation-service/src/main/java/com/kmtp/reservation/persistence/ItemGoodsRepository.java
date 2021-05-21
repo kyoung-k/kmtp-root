@@ -8,5 +8,9 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface ItemGoodsRepository extends ReactiveCrudRepository<ItemGoodsEntity, Long> {
 
+    Flux<ItemGoodsEntity> findByGoodsId(Long goodsId);
+
+    Flux<ItemGoodsEntity> findByItemId(Long itemId);
+
     Mono<Void> deleteByGoodsId(Long id);
 }

@@ -22,8 +22,7 @@ public class ScheduleRouter {
     public RouterFunction<ServerResponse> scheduleRoutes() {
         return RouterFunctions.route()
                 .GET("/schedule/{masterId}", scheduleHandler::findById)
-                .POST("/schedule", scheduleHandler::post)
-                .PUT("/schedule/{masterId}", scheduleHandler::put)
+                .POST("/schedule/{masterId}", scheduleHandler::post)
                 .DELETE("/schedule/{masterId}", scheduleHandler::delete)
                 .build();
     }
