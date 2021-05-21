@@ -15,17 +15,14 @@
  */
 package com.kmtp.common.http;
 
-import com.kmtp.common.exception.ValidationException;
+import com.kmtp.common.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class ResponseErrorHandler {

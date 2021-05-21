@@ -2,8 +2,10 @@
 select * from masters;
 select * from schedules;
 select * from items;
+select * from charges;
 select * from goods;
 select * from discounts;
+select * from itemgoods;
 select * from members;
 
 
@@ -46,6 +48,7 @@ create table itemgoods
 (
     id       bigint auto_increment
         primary key,
+    version int,
     item_id  bigint not null,
     goods_id bigint not null
 );

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.common.exception;
+package com.kmtp.common.validation;
 
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;

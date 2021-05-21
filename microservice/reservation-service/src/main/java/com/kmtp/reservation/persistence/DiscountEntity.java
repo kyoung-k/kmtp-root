@@ -1,5 +1,6 @@
 package com.kmtp.reservation.persistence;
 
+import com.kmtp.common.generic.GenericEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @Table("discounts")
 @AllArgsConstructor
-public class DiscountEntity {
+public class DiscountEntity extends GenericEntity<DiscountEntity> {
 
     @Id
     private Long id;

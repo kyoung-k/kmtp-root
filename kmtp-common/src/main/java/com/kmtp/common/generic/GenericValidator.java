@@ -15,12 +15,14 @@
  */
 package com.kmtp.common.generic;
 
-import com.kmtp.common.exception.ValidationErrorHandler;
+import com.kmtp.common.validation.ValidationErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
+import java.util.List;
 
 @Component
 public class GenericValidator {
@@ -36,6 +38,21 @@ public class GenericValidator {
 
         Errors errors = new BeanPropertyBindingResult(api, elementClass.getName());
         validator.validate(api, errors);
+
+        if (errors.hasErrors()) {
+            ValidationErrorHandler.build(errors);
+        }
+    }
+
+    public <T> void validateList(List<T> list, Class<? extends T> elementClass) {
+
+        // TODO List Validation index 처리
+        Errors errors = new BeanPropertyBindingResult(list, elementClass.getName());
+
+        list.forEach(object -> {
+            validator.validate(object, errors);
+        });
+
         if (errors.hasErrors()) {
             ValidationErrorHandler.build(errors);
         }

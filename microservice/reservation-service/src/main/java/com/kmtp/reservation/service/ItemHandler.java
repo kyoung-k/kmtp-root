@@ -2,26 +2,20 @@ package com.kmtp.reservation.service;
 
 import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
-import com.kmtp.common.http.ResponseErrorHandler;
 import com.kmtp.common.http.ResponseHandler;
 import com.kmtp.reservation.endpoint.Charge;
 import com.kmtp.reservation.endpoint.Item;
 import com.kmtp.reservation.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
-
-import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 @Component
 public class ItemHandler {
@@ -124,7 +118,7 @@ public class ItemHandler {
         final Mono<ChargeEntity> chargeEntityMono = chargeRepository.findByItemId(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item charge."));
 
-        final Mono<?> updateItemMono = Mono.zip(itemMono, itemEntityMono, chargeEntityMono)
+        final Mono<ChargeEntity> updateItemMono = Mono.zip(itemMono, itemEntityMono, chargeEntityMono)
                 .doOnNext(tuple3 -> tuple3.getT2()
                         .change(itemEntity -> itemEntity.setName(tuple3.getT1().getName())))
                 .doOnNext(tuple3 -> tuple3.getT3()

@@ -2,24 +2,20 @@ package com.kmtp.reservation.service;
 
 import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
-import com.kmtp.common.http.RequestHandler;
 import com.kmtp.common.http.ResponseHandler;
 import com.kmtp.reservation.endpoint.Discount;
 import com.kmtp.reservation.endpoint.Goods;
 import com.kmtp.reservation.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.relational.core.sql.Not;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.List;
-
-import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 @Component
 public class GoodsHandler {
@@ -39,16 +35,27 @@ public class GoodsHandler {
 
     public Mono<ServerResponse> list(ServerRequest request) {
 
-        final Mono<Long> masterId = request.queryParam("masterId")
+        final Mono<Long> masterIdMono = request.queryParam("masterId")
                 .map(Long::parseLong)
                 .map(Mono::just)
                 .orElseGet(Mono::empty);
 
-        final Mono<List<Goods>> listMono = masterId
+        final Mono<List<Goods>> listMono = masterIdMono
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "query param master-id is required."))
-                .flatMapMany(goodsRepository::findByMasterId)
-                .map(GoodsMapper.INSTANCE::entityToApi)
-                .collectList();
+                .flatMapMany(masterId -> {
+
+                    final Flux<Goods> goodsFlux = goodsRepository.findByMasterId(masterId)
+                            .map(GoodsMapper.INSTANCE::entityToApi);
+
+                    final Flux<Discount> discountFlux = discountRepository.findByMasterId(masterId)
+                            .map(DiscountMapper.INSTANCE::entityToApi);
+
+                    return Flux.zip(goodsFlux, discountFlux)
+                            .flatMap(tuple2 -> {
+                               tuple2.getT1().setDiscount(tuple2.getT2());
+                               return Mono.just(tuple2.getT1());
+                            });
+                }).collectList();
 
         return ResponseHandler.ok(listMono);
     }
@@ -61,7 +68,17 @@ public class GoodsHandler {
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods-id."))
                 .map(GoodsMapper.INSTANCE::entityToApi);
 
-        return ResponseHandler.ok(goodsMono);
+        final Mono<Discount> discountMono = discountRepository.findByGoodsId(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods discount."))
+                .map(DiscountMapper.INSTANCE::entityToApi);
+
+        final Mono<Goods> responseMono = Mono.zip(goodsMono, discountMono)
+                .flatMap(tuple2 -> {
+                    tuple2.getT1().setDiscount(tuple2.getT2());
+                    return Mono.just(tuple2.getT1());
+                });
+
+        return ResponseHandler.ok(responseMono);
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {
@@ -93,15 +110,25 @@ public class GoodsHandler {
         final Long id = Long.parseLong(request.pathVariable("id"));
 
         final Mono<Goods> goodsMono = request.bodyToMono(Goods.class)
-                .doOnNext(goods -> genericValidator.validate(goods, Goods.class));
+                .doOnNext(goods -> genericValidator.validate(goods, Goods.class))
+                .doOnNext(goods -> genericValidator.validate(goods.getDiscount(), Discount.class));
 
         final Mono<GoodsEntity> goodsEntityMono = goodsRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods-id."));
 
-        final Mono<GoodsEntity> updateGoodsMono = Mono.zip(goodsMono, goodsEntityMono)
-                .doOnNext(tuple2 -> tuple2.getT2()
-                        .change(goodsEntity -> goodsEntity.setName(tuple2.getT1().getName())))
-                .flatMap(tuple2 -> goodsRepository.save(tuple2.getT2()));
+        final Mono<DiscountEntity> discountEntityMono = discountRepository.findByGoodsId(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods discount."));
+
+        final Mono<DiscountEntity> updateGoodsMono = Mono.zip(goodsMono, goodsEntityMono, discountEntityMono)
+                .doOnNext(tuple3 -> tuple3.getT2()
+                        .change(goodsEntity -> goodsEntity.setName(tuple3.getT1().getName())))
+                .doOnNext(tuple3 -> tuple3.getT3()
+                        .change(discountEntity -> {
+                            discountEntity.setDiscount(tuple3.getT1().getDiscount().getDiscount());
+                            discountEntity.setName(tuple3.getT1().getDiscount().getName());
+                        }))
+                .flatMap(tuple3 -> goodsRepository.save(tuple3.getT2())
+                        .then(discountRepository.save(tuple3.getT3())));
 
         return ResponseHandler.noContent(updateGoodsMono);
     }
@@ -110,10 +137,14 @@ public class GoodsHandler {
 
         final Long id = Long.parseLong(request.pathVariable("id"));
 
+        final Mono<Void> discountMono = discountRepository.findByGoodsId(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods discount."))
+                .then(discountRepository.deleteByGoodsId(id));
+
         final Mono<Void> goodsMono = goodsRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods-id."))
                 .then(goodsRepository.deleteById(id));
 
-        return ResponseHandler.noContent(goodsMono);
+        return ResponseHandler.noContent(Mono.zip(discountMono, goodsMono));
     }
 }

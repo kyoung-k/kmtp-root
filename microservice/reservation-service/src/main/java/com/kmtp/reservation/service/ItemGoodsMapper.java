@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.common.exception;
+package com.kmtp.reservation.service;
 
-import lombok.Builder;
-import lombok.Data;
+import com.kmtp.common.generic.GenericMapper;
+import com.kmtp.reservation.endpoint.Goods;
+import com.kmtp.reservation.endpoint.ItemGoods;
+import com.kmtp.reservation.persistence.GoodsEntity;
+import com.kmtp.reservation.persistence.ItemGoodsEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Data
-@Builder
-public class ValidationError {
+@Mapper(componentModel = "spring")
+public interface ItemGoodsMapper extends GenericMapper<ItemGoods, ItemGoodsEntity> {
 
-    private String code;
-    private String field;
-    private String message;
+    ItemGoodsMapper INSTANCE = Mappers.getMapper( ItemGoodsMapper.class );
 }
