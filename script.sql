@@ -6,6 +6,7 @@ select * from charges;
 select * from goods;
 select * from discounts;
 select * from itemgoods;
+select * from reservations;
 select * from members;
 
 
@@ -126,11 +127,12 @@ create table reservations
 (
     id                 bigint auto_increment
         primary key,
+    version int,
     master_id          bigint not null,
     schedule_id        bigint not null,
-    member_id          bigint not null,
+    member_id          bigint null,
     item_id            bigint not null,
-    goods_id           bigint not null,
+    goods_id           bigint null,
     reservation_date   date   not null,
     reservation_charge double not null
 );

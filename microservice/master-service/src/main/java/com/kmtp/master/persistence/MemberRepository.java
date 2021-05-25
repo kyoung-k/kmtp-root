@@ -15,10 +15,8 @@
  */
 package com.kmtp.master.persistence;
 
-import com.kmtp.master.endpoint.Member;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
 
 @Repository
 public interface MemberRepository extends ReactiveCrudRepository<MemberEntity, Long> {

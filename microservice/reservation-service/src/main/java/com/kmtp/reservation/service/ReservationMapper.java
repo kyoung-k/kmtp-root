@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.master.endpoint;
+package com.kmtp.reservation.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import com.kmtp.common.generic.GenericMapper;
+import com.kmtp.common.api.Reservation;
+import com.kmtp.reservation.persistence.ReservationEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-import javax.validation.constraints.NotBlank;
+@Mapper(componentModel = "spring")
+public interface ReservationMapper extends GenericMapper<Reservation, ReservationEntity> {
 
-@Data
-@Builder
-@AllArgsConstructor
-public class Master {
-
-    private Long id;
-    @NotBlank
-    private String name;
-    private String information;
+    ReservationMapper INSTANCE = Mappers.getMapper( ReservationMapper.class );
 }

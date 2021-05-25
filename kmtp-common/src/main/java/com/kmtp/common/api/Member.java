@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.reservation.endpoint;
+package com.kmtp.common.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
 @Data
 @Builder
 @AllArgsConstructor
-public class Charge {
+public class Member {
 
     private Long id;
-    private Long masterId;
-    private Long itemId;
-    @NotNull
-    private Long charge;
-    @NotEmpty
+    private String email;
     private String name;
+    private int age;
+    private String address;
 }

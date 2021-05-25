@@ -16,7 +16,7 @@
 package com.kmtp.master.service;
 
 import com.kmtp.common.generic.GenericMapper;
-import com.kmtp.master.endpoint.Master;
+import com.kmtp.common.api.Master;
 import com.kmtp.master.persistence.MasterEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

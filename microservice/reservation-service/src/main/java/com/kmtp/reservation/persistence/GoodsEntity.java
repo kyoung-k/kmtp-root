@@ -1,7 +1,6 @@
 package com.kmtp.reservation.persistence;
 
 import com.kmtp.common.generic.GenericEntity;
-import com.kmtp.reservation.endpoint.Goods;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

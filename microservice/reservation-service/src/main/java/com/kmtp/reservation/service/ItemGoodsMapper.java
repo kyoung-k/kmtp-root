@@ -16,9 +16,7 @@
 package com.kmtp.reservation.service;
 
 import com.kmtp.common.generic.GenericMapper;
-import com.kmtp.reservation.endpoint.Goods;
-import com.kmtp.reservation.endpoint.ItemGoods;
-import com.kmtp.reservation.persistence.GoodsEntity;
+import com.kmtp.common.api.ItemGoods;
 import com.kmtp.reservation.persistence.ItemGoodsEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

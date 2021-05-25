@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.reservation.endpoint;
+package com.kmtp.common.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,13 +25,13 @@ import javax.validation.constraints.NotNull;
 @Data
 @Builder
 @AllArgsConstructor
-public class Discount {
+public class Charge {
 
     private Long id;
     private Long masterId;
-    private Long goodsId;
+    private Long itemId;
     @NotNull
-    private Double discount;
+    private Long charge;
     @NotEmpty
     private String name;
 }

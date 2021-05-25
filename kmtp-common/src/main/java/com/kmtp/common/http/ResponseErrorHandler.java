@@ -89,17 +89,4 @@ public class ResponseErrorHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(mono, HttpErrorInfo.class);
     }
-
-    public static Mono<ServerResponse> notFound(String target) {
-
-        Mono<HttpErrorInfo> mono = Mono.just(HttpErrorInfo.builder()
-                .timestamp(ZonedDateTime.now())
-                .message(String.format("not found %s", target))
-                .error(Collections.emptyList())
-                .build());
-
-        return ServerResponse.status(HttpStatus.NOT_FOUND)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(mono, HttpErrorInfo.class);
-    }
 }

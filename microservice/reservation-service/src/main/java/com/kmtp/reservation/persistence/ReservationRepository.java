@@ -2,7 +2,16 @@ package com.kmtp.reservation.persistence;
 
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
 
 @Repository
 public interface ReservationRepository extends ReactiveCrudRepository<ReservationEntity, Long> {
+
+    Mono<ReservationEntity> findByMasterIdAndScheduleIdAndItemIdAndReservationDate
+            (Long masterId
+            , Long scheduleId
+            , Long itemId
+            , LocalDate reservationDate);
 }

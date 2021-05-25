@@ -21,6 +21,10 @@ import reactor.core.publisher.Mono;
 
 public class GenericError {
 
+    public static void error(HttpStatus httpStatus, String message) {
+        throw new ResponseStatusException(httpStatus, message);
+    }
+
     public static <T> Mono<? extends T> of(HttpStatus httpStatus, String message) {
         return Mono.error(new ResponseStatusException(httpStatus, message));
     }

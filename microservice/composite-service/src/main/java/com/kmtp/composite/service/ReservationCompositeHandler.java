@@ -15,12 +15,13 @@
  */
 package com.kmtp.composite.service;
 
+import com.kmtp.common.api.Goods;
 import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.HttpInfo;
 import com.kmtp.common.http.ResponseHandler;
-import com.kmtp.composite.endpoint.Goods;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -46,13 +47,13 @@ public class ReservationCompositeHandler {
 
         final Long masterId = Long.parseLong(request.pathVariable("masterId"));
 
-        Mono<List<Goods>> responseString = webClient.get()
+        Mono<List<Goods>> listMono = webClient.get()
                 .uri("http://localhost:8882/goods?masterId={masterId}", masterId)
                 .retrieve()
-                .bodyToMono(HttpInfo.class)
-                .flatMap(httpInfo -> Mono.just((List<Goods>) httpInfo.getData()));
+                .bodyToMono(new ParameterizedTypeReference<HttpInfo<Goods>>(){})
+                .map(goodsHttpInfo -> goodsHttpInfo.getData());
 
-        return ResponseHandler.ok(responseString);
+        return ResponseHandler.ok(Mono.empty());
     }
 
     public Mono<ServerResponse> itemList(ServerRequest request) {

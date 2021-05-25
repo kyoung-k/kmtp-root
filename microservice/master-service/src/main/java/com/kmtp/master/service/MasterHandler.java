@@ -17,15 +17,13 @@ package com.kmtp.master.service;
 
 import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
-import com.kmtp.common.http.ResponseErrorHandler;
 import com.kmtp.common.http.ResponseHandler;
-import com.kmtp.master.endpoint.Master;
+import com.kmtp.common.api.Master;
 import com.kmtp.master.persistence.MasterEntity;
 import com.kmtp.master.persistence.MasterRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
