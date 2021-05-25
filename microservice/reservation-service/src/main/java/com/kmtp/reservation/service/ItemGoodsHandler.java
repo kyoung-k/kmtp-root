@@ -63,29 +63,31 @@ public class ItemGoodsHandler {
 
     public Mono<ServerResponse> post(ServerRequest request) {
 
-        Mono<List<ItemGoodsEntity>> listMono = RequestHandler.jsonBodyToList(request, ItemGoods[].class)
-                .doOnNext(itemGoods -> genericValidator.validateList(itemGoods, ItemGoods.class))
-                .flatMapMany(Flux::fromIterable)
-                .flatMap(itemGoods -> {
+        final Long goodsId = Long.parseLong(request.pathVariable("goodsId"));
 
-                    final Mono<ItemEntity> itemEntityMono = itemRepository.findById(itemGoods.getItemId())
-                            .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item."));
+        Mono<List<ItemGoodsEntity>> listMono = itemGoodsRepository.deleteByGoodsId(goodsId)
+                .flatMap(delete -> RequestHandler.jsonBodyToList(request, ItemGoods[].class)
+                        .doOnNext(itemGoods -> genericValidator.validateList(itemGoods, ItemGoods.class))
+                        .flatMapMany(Flux::fromIterable)
+                        .flatMap(itemGoods -> {
 
-                    final Mono<GoodsEntity> goodsEntityMono = goodsRepository.findById(itemGoods.getGoodsId())
-                            .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods."));
+                            final Mono<ItemEntity> itemEntityMono = itemRepository.findById(itemGoods.getItemId())
+                                    .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item."));
 
-                    return Mono.zip(itemEntityMono, goodsEntityMono);
-                })
-                .flatMap(tuple2 -> {
+                            final Mono<GoodsEntity> goodsEntityMono = goodsRepository.findById(itemGoods.getGoodsId())
+                                    .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found goods."));
 
-                    final ItemGoodsEntity itemGoodsEntity = ItemGoodsEntity.builder()
-                            .itemId(tuple2.getT1().getId())
-                            .goodsId(tuple2.getT2().getId())
-                            .build();
+                            return Mono.zip(itemEntityMono, goodsEntityMono);
+                        })
+                        .flatMap(tuple2 -> {
 
-                    return itemGoodsRepository.deleteByGoodsId(tuple2.getT2().getId())
-                            .then(itemGoodsRepository.save(itemGoodsEntity));
-                }).collectList();
+                            final ItemGoodsEntity itemGoodsEntity = ItemGoodsEntity.builder()
+                                    .itemId(tuple2.getT1().getId())
+                                    .goodsId(tuple2.getT2().getId())
+                                    .build();
+
+                            return itemGoodsRepository.save(itemGoodsEntity);
+                        }).collectList());
 
         return ResponseHandler.created(listMono, URI.create(request.path()));
     }

@@ -28,10 +28,10 @@ public class ResponseHandler {
     private ResponseHandler() {
     }
 
-    private static <T> List<?> setData(T data) {
+    private static <T> List<T> setData(T data) {
 
         if (data instanceof List) {
-            return (List<?>) data;
+            return (List<T>) data;
         } else {
             return List.of(data);
         }
@@ -39,7 +39,7 @@ public class ResponseHandler {
 
     public static <T> Mono<ServerResponse> ok(Mono<? extends T> mono) {
 
-        return mono.map(t -> Mono.just(HttpInfo.builder()
+        return mono.map(t -> Mono.just(HttpInfo.<T>builder()
                         .timestamp(ZonedDateTime.now())
                         .message("success")
                         .data(setData(t))

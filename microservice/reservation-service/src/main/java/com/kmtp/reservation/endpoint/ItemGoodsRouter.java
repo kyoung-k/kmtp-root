@@ -27,7 +27,7 @@ public class ItemGoodsRouter {
         return RouterFunctions.route()
                 .GET("/itemGoods/item/{itemId}", itemGoodsHandler::itemList)
                 .GET("/itemGoods/goods/{goodsId}", itemGoodsHandler::goodsList)
-                .POST("/itemGoods", itemGoodsHandler::post)
+                .POST("/itemGoods/{goodsId}", itemGoodsHandler::post)
                 .DELETE("/itemGoods/{goodsId}", itemGoodsHandler::delete)
                 .filter(functionalApiExceptionFilter.exceptionHandler())
                 .build();

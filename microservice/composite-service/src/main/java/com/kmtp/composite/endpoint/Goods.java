@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.common.http;
+package com.kmtp.composite.endpoint;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.ZonedDateTime;
-import java.util.List;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-public class HttpInfo<T> {
+@AllArgsConstructor
+public class Goods {
 
-    private ZonedDateTime timestamp;
-    private String message;
-    private List<T> data;
+    private Long id;
+    private Long masterId;
+    @NotBlank
+    private String name;
+    @NotNull
+    private Discount discount;
 }
