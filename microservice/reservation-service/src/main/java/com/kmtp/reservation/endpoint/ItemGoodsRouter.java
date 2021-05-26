@@ -1,7 +1,6 @@
 package com.kmtp.reservation.endpoint;
 
 import com.kmtp.common.filter.FunctionalApiExceptionFilter;
-import com.kmtp.reservation.service.GoodsHandler;
 import com.kmtp.reservation.service.ItemGoodsHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
