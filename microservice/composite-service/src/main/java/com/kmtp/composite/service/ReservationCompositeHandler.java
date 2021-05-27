@@ -15,21 +15,30 @@
  */
 package com.kmtp.composite.service;
 
+import com.kmtp.common.api.ApiInfo;
 import com.kmtp.common.api.Goods;
 import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.HttpInfo;
 import com.kmtp.common.http.ResponseHandler;
+import com.kmtp.common.http.WebClientHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -47,15 +56,15 @@ public class ReservationCompositeHandler {
 
     public Mono<ServerResponse> goodsList(ServerRequest request) {
 
-        final Long masterId = Long.parseLong(request.pathVariable("masterId"));
+        final MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>(){{
+            put("masterId", Collections.singletonList(request.pathVariable("masterId")));
+        }};
 
-        Mono<List<Goods>> listMono = webClient.get()
-                .uri("http://localhost:8882/goods?masterId={masterId}", masterId)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<HttpInfo<Goods>>(){})
-                .map(goodsHttpInfo -> goodsHttpInfo.getData());
+        final Mono<List<Goods>> goodsListMono = WebClientHandler.build(ApiInfo.GOODS_LIST)
+                .queryParam(paramMap)
+                .exchange();
 
-        return ResponseHandler.ok(Mono.empty());
+        return ResponseHandler.ok(goodsListMono);
     }
 
     public Mono<ServerResponse> itemList(ServerRequest request) {

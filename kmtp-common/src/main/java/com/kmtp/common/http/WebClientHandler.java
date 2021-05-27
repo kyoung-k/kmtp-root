@@ -15,29 +15,66 @@
  */
 package com.kmtp.common.http;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.kmtp.common.adaptor.ZonedDateTimeTypeAdaptor;
 import com.kmtp.common.api.ApiInfo;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
+import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
-public class WebClientHandler {
+public class WebClientHandler<T> {
 
     private WebClient.ResponseSpec webClient;
 
-    private WebClientHandler(Builder builder) {
+    private final ApiInfo apiInfo;
+    private Object[] uriVariables;
+    private MultiValueMap<String, String> queryParam;
 
-        this.webClient = MethodType.valueOf(builder.apiInfo.getHttpMethod().name()).function.apply(builder);
+    private WebClientHandler(ApiInfo apiInfo) {
+
+        this.apiInfo = apiInfo;
+    }
+
+    public static WebClientHandler build(ApiInfo apiInfo) {
+        return new WebClientHandler(apiInfo);
+    }
+
+    public WebClientHandler uriVariables(Object... uriVariables) {
+        this.uriVariables = uriVariables;
+        return this;
+    }
+
+    public WebClientHandler queryParam(MultiValueMap<String, String> multiValueMap) {
+        this.queryParam = multiValueMap;
+        return this;
+    }
+
+    public Mono<List<T>> exchange() {
+        return MethodType.valueOf(this.apiInfo.getHttpMethod().name()).function.apply(this)
+                .bodyToMono(String.class)
+                .flatMap(jsonBody -> {
+                    final HttpInfo<T> httpInfo = new GsonBuilder()
+                            .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeTypeAdaptor())
+                            .create()
+                            .fromJson(jsonBody, HttpInfo.class);
+
+                    return Mono.just(httpInfo.getData());
+                });
     }
 
     private enum MethodType {
         GET(HttpMethod.GET, builder -> getWebClient()
                 .get()
-                .uri(uriBuilder -> uriBuilder.port(builder.apiInfo.getPort())
-                        .path(builder.apiInfo.getPath())
-                        .queryParams(builder.queryParam)
-                        .build(builder.uriVariables))
+                .uri(uriBuilder -> createUri(uriBuilder, builder))
                 .retrieve()
         ),
         ;
@@ -45,40 +82,33 @@ public class WebClientHandler {
 //        PUT(HttpMethod.PUT),
 //        DELETE(HttpMethod.DELETE);
 
-        MethodType(HttpMethod httpMethod, Function<Builder, WebClient.ResponseSpec> function) {
+        MethodType(HttpMethod httpMethod, Function<WebClientHandler, WebClient.ResponseSpec> function) {
             this.httpMethod = httpMethod;
             this.function = function;
         }
 
         private final HttpMethod httpMethod;
-        private final Function<Builder, WebClient.ResponseSpec> function;
+
+        private final Function<WebClientHandler, WebClient.ResponseSpec> function;
+
         private final static WebClient getWebClient() {
             return WebClient.builder().baseUrl("http://localhost").build();
         }
-    }
 
-    public static class Builder {
+        private final static URI createUri(UriBuilder uriBuilder, WebClientHandler webClientHandler) {
 
-        private final ApiInfo apiInfo;
-        private Object[] uriVariables;
-        private MultiValueMap<String, String> queryParam;
+            uriBuilder.port(webClientHandler.apiInfo.getPort())
+                    .path(webClientHandler.apiInfo.getPath());
 
-        public Builder(ApiInfo apiInfo) {
-            this.apiInfo = apiInfo;
-        }
+            if (webClientHandler.queryParam != null) {
+                uriBuilder.queryParams(webClientHandler.queryParam);
+            }
 
-        public Builder uriVariables(Object... uriVariables) {
-            this.uriVariables = uriVariables;
-            return this;
-        }
-
-        public Builder queryParam(MultiValueMap<String, String> multiValueMap) {
-            this.queryParam = queryParam;
-            return this;
-        }
-
-        public WebClientHandler build() {
-            return new WebClientHandler(this);
+            if (webClientHandler.uriVariables != null) {
+                return uriBuilder.build(uriBuilder);
+            } else {
+                return uriBuilder.build();
+            }
         }
     }
 }
