@@ -62,7 +62,7 @@ public class ReservationCompositeHandler {
 
         final Mono<List<Goods>> goodsListMono = WebClientHandler.build(ApiInfo.GOODS_LIST)
                 .queryParam(paramMap)
-                .exchange();
+                .monoList(Goods.class);
 
         return ResponseHandler.ok(goodsListMono);
     }

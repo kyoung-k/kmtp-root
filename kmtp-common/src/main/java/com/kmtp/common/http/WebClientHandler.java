@@ -15,25 +15,19 @@
  */
 package com.kmtp.common.http;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.kmtp.common.adaptor.ZonedDateTimeTypeAdaptor;
 import com.kmtp.common.api.ApiInfo;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class WebClientHandler<T> {
-
-    private WebClient.ResponseSpec webClient;
+public class WebClientHandler {
 
     private final ApiInfo apiInfo;
     private Object[] uriVariables;
@@ -58,23 +52,32 @@ public class WebClientHandler<T> {
         return this;
     }
 
-    public Mono<List<T>> exchange() {
-        return MethodType.valueOf(this.apiInfo.getHttpMethod().name()).function.apply(this)
-                .bodyToMono(String.class)
-                .flatMap(jsonBody -> {
-                    final HttpInfo<T> httpInfo = new GsonBuilder()
-                            .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeTypeAdaptor())
-                            .create()
-                            .fromJson(jsonBody, HttpInfo.class);
+    public <T> Mono<T> mono(Class<T> clazz) {
+        return this.exchange()
+                .map(httpInfo -> httpInfo.getData()
+                        .parallelStream()
+                        .map(clazz::cast)
+                        .collect(Collectors.toList()).get(0));
+    }
 
-                    return Mono.just(httpInfo.getData());
-                });
+    public <T> Mono<List<T>> monoList(Class<T> clazz) {
+        return this.exchange()
+                .map(httpInfo -> httpInfo.getData()
+                        .parallelStream()
+                        .map(clazz::cast)
+                        .collect(Collectors.toList()));
+    }
+
+    private <T> Mono<HttpInfo<T>> exchange() {
+        return MethodType.valueOf(this.apiInfo.getHttpMethod().name())
+                .function.apply(this)
+                .bodyToMono(new ParameterizedTypeReference<>() {});
     }
 
     private enum MethodType {
-        GET(HttpMethod.GET, builder -> getWebClient()
-                .get()
-                .uri(uriBuilder -> createUri(uriBuilder, builder))
+        GET(webClientHandler -> getWebClient()
+                .method(webClientHandler.apiInfo.getHttpMethod())
+                .uri(uriBuilder -> createUri(uriBuilder, webClientHandler))
                 .retrieve()
         ),
         ;
@@ -82,12 +85,9 @@ public class WebClientHandler<T> {
 //        PUT(HttpMethod.PUT),
 //        DELETE(HttpMethod.DELETE);
 
-        MethodType(HttpMethod httpMethod, Function<WebClientHandler, WebClient.ResponseSpec> function) {
-            this.httpMethod = httpMethod;
+        MethodType(Function<WebClientHandler, WebClient.ResponseSpec> function) {
             this.function = function;
         }
-
-        private final HttpMethod httpMethod;
 
         private final Function<WebClientHandler, WebClient.ResponseSpec> function;
 

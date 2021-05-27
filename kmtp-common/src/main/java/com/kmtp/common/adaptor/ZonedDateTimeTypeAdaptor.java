@@ -38,4 +38,9 @@ public class ZonedDateTimeTypeAdaptor implements JsonSerializer<ZonedDateTime>, 
     public JsonElement serialize(ZonedDateTime src, Type typeOfSrc, JsonSerializationContext context) {
         return new JsonPrimitive(src.format(DateTimeFormatter.ISO_INSTANT));
     }
+
+//  final HttpInfo<T> httpInfo = new GsonBuilder()
+//      .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeTypeAdaptor())
+//      .create()
+//      .fromJson(jsonBody, new TypeToken<HttpInfo<T>>(){}.getType());
 }
