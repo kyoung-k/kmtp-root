@@ -15,14 +15,17 @@
  */
 package com.kmtp.common.http;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.kmtp.common.adaptor.ZonedDateTimeTypeAdaptor;
 import com.kmtp.common.api.ApiInfo;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -53,7 +56,7 @@ public class WebClientHandler {
     }
 
     public <T> Mono<T> mono(Class<T> clazz) {
-        return this.exchange()
+        return this.exchange(clazz)
                 .map(httpInfo -> httpInfo.getData()
                         .parallelStream()
                         .map(clazz::cast)
@@ -61,17 +64,21 @@ public class WebClientHandler {
     }
 
     public <T> Mono<List<T>> monoList(Class<T> clazz) {
-        return this.exchange()
+        return this.exchange(clazz)
                 .map(httpInfo -> httpInfo.getData()
                         .parallelStream()
                         .map(clazz::cast)
                         .collect(Collectors.toList()));
     }
 
-    private <T> Mono<HttpInfo<T>> exchange() {
+    private <T> Mono<HttpInfo<T>> exchange(Class<T> clazz) {
         return MethodType.valueOf(this.apiInfo.getHttpMethod().name())
                 .function.apply(this)
-                .bodyToMono(new ParameterizedTypeReference<>() {});
+                .bodyToMono(String.class)
+                .map(jsonBody -> new GsonBuilder()
+                        .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeTypeAdaptor())
+                        .create()
+                        .fromJson(jsonBody, TypeToken.getParameterized(HttpInfo.class, clazz).getType()));
     }
 
     private enum MethodType {
@@ -105,7 +112,7 @@ public class WebClientHandler {
             }
 
             if (webClientHandler.uriVariables != null) {
-                return uriBuilder.build(uriBuilder);
+                return uriBuilder.build(webClientHandler.uriVariables);
             } else {
                 return uriBuilder.build();
             }
