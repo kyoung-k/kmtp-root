@@ -133,7 +133,8 @@ create table reservations
     member_id          bigint null,
     item_id            bigint not null,
     goods_id           bigint null,
-    reservation_date   date   not null,
+    start_date   date   not null,
+    end_date   date   not null,
     reservation_charge double not null
 );
 

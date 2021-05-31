@@ -30,8 +30,10 @@ public class ReservationEntity {
     private Long itemId;
     @Column("goods_id")
     private Long goodsId;
-    @Column("reservation_date")
-    private LocalDate reservationDate;
+    @Column("start_date")
+    private LocalDate startDate;
+    @Column("end_date")
+    private LocalDate endDate;
     @Column("reservation_charge")
     private Integer reservationCharge;
 }

@@ -15,12 +15,14 @@
  */
 package com.kmtp.master.service;
 
+import com.kmtp.common.api.Schedule;
 import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.ResponseHandler;
 import com.kmtp.common.api.Master;
 import com.kmtp.master.persistence.MasterEntity;
 import com.kmtp.master.persistence.MasterRepository;
+import com.kmtp.master.persistence.ScheduleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,17 +32,23 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @Component
 public class MasterHandler {
 
     final private MasterRepository masterRepository;
+    final private ScheduleRepository scheduleRepository;
     final private GenericValidator genericValidator;
 
     @Autowired
-    public MasterHandler(MasterRepository masterRepository, GenericValidator genericValidator) {
+    public MasterHandler(MasterRepository masterRepository
+            , ScheduleRepository scheduleRepository
+            , GenericValidator genericValidator) {
+
         this.masterRepository = masterRepository;
+        this.scheduleRepository = scheduleRepository;
         this.genericValidator = genericValidator;
     }
 
@@ -52,7 +60,18 @@ public class MasterHandler {
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found master-id."))
                 .map(MasterMapper.INSTANCE::entityToApi);
 
-        return ResponseHandler.ok(masterMono);
+        Mono<List<Schedule>> scheduleListMono = scheduleRepository.findByMasterId(id)
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found master schedule"))
+                .collectList()
+                .map(ScheduleMapper.INSTANCE::entityListToApiList);
+
+        Mono<Master> responseMono = Mono.zip(masterMono, scheduleListMono)
+                .flatMap(tuple2 -> {
+                    tuple2.getT1().setScheduleList(tuple2.getT2());
+                    return Mono.just(tuple2.getT1());
+                });
+
+        return ResponseHandler.ok(responseMono);
     }
 
     public Mono<ServerResponse> post( ServerRequest request ) {

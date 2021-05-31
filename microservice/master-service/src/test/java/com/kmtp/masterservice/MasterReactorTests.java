@@ -1,7 +1,11 @@
 package com.kmtp.masterservice;
 
+import com.kmtp.common.api.Schedule;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MasterReactorTests {
 
@@ -22,5 +26,18 @@ public class MasterReactorTests {
                     System.out.println("tuple2.getT1() :: " + tuple2.get(1));
                     System.out.println("tuple2.getT1() :: " + tuple2.get(3));
                 });
+    }
+
+    @Test
+    void complementOfSet() {
+
+        List<Long> lista = List.of(1l, 2l, 3l, 4l);
+        List<Long> listb = List.of(2l, 3l);
+
+
+        System.out.println(lista.stream()
+                .filter(aLong -> listb.stream().allMatch(blong -> aLong != blong))
+                .collect(Collectors.toList()));
+
     }
 }

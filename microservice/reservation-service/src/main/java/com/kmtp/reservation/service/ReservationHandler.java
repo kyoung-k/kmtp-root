@@ -14,6 +14,9 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -29,15 +32,55 @@ public class ReservationHandler {
         this.genericValidator = genericValidator;
     }
 
+    public Mono<ServerResponse> checkList(ServerRequest request) {
+
+        Mono<Long> masterIdMono = request.queryParam("masterId")
+                .map(Long::parseLong)
+                .map(Mono::just)
+                .orElseGet(Mono::empty);
+
+        Mono<Long> itemIdMono = request.queryParam("itemId")
+                .map(Long::parseLong)
+                .map(Mono::just)
+                .orElseGet(Mono::empty);
+
+        Mono<LocalDate> startDateMono = request.queryParam("startDate")
+                .map(startDate -> LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE))
+                .map(Mono::just)
+                .orElseGet(Mono::empty);
+
+        Mono<LocalDate> endDateMono = request.queryParam("endDate")
+                .map(endDate -> LocalDate.parse(endDate, DateTimeFormatter.ISO_DATE))
+                .map(Mono::just)
+                .orElseGet(Mono::empty);
+
+        reservationRepository.findByStartDateLessThanEqualOrEndDateGreaterThanEqual(
+                LocalDate.of(2021, 6, 19), LocalDate.of(2021, 6, 20))
+                .doOnNext(System.out::println)
+                .subscribe();
+
+        Mono<List<Reservation>> reservationMono = Mono.zip(masterIdMono, itemIdMono, startDateMono, endDateMono)
+                .flatMapMany(tuple4 -> reservationRepository.findByMasterIdAndItemIdAndStartDateBeforeAndEndDateAfter(
+                        tuple4.getT1()
+                        , tuple4.getT2()
+                        , tuple4.getT3()
+                        , tuple4.getT4()))
+                .collectList()
+                .map(ReservationMapper.INSTANCE::entityListToApiList);
+
+        return ResponseHandler.ok(reservationMono);
+    }
+
     public Mono<ServerResponse> post(ServerRequest request) {
 
         Mono<ReservationEntity> reservationMono = request.bodyToMono(Reservation.class)
                 .doOnNext(reservation -> genericValidator.validate(reservation, Reservation.class))
-                .flatMap(reservation -> reservationRepository.findByMasterIdAndScheduleIdAndItemIdAndReservationDate(
+                .flatMap(reservation -> reservationRepository.findByMasterIdAndScheduleIdAndItemIdAndStartDateBeforeAndEndDateAfter(
                         reservation.getMasterId()
                         , reservation.getScheduleId()
                         , reservation.getItemId()
-                        , reservation.getReservationDate())
+                        , reservation.getStartDate()
+                        , reservation.getEndDate())
                         .doOnNext(reservationEntity -> Optional.of(reservationEntity)
                                 .ifPresent(optional -> GenericError.error(HttpStatus.BAD_REQUEST, "Reservations cannot be made on that date.")))
                         .switchIfEmpty(Mono.defer(() -> Mono.just(ReservationMapper.INSTANCE.apiToEntity(reservation)))))

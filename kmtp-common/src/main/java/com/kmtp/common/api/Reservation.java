@@ -38,7 +38,9 @@ public class Reservation {
     private Long itemId;
     private Long goodsId;
     @NotNull
-    private LocalDate reservationDate;
+    private LocalDate startDate;
+    @NotNull
+    private LocalDate endDate;
     @NotNull
     private Integer reservationCharge;
 }

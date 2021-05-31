@@ -17,6 +17,8 @@ package com.kmtp.common.api;
 
 import lombok.Data;
 
+import java.util.List;
+
 public class ReservationDetail {
 
     @Data
@@ -32,6 +34,25 @@ public class ReservationDetail {
 
         private Long charge;
         private Long discountCharge;
-        private Schedule schedule;
+        private List<Schedule> schedule;
+
+        public static ReservationDetail.Response setDetail(Master master, Goods goods, Item item) {
+
+            ReservationDetail.Response response = new ReservationDetail.Response();
+
+            response.setMasterId(master.getId());
+            response.setItemId(item.getId());
+            response.setGoodsId(goods.getId());
+
+            response.setMasterName(master.getName());
+            response.setItemName(item.getName());
+            response.setGoodsName(goods.getName());
+
+            response.setCharge(item.getCharge().getCharge());
+            response.setDiscountCharge((long) (item.getCharge().getCharge() - (item.getCharge().getCharge() * goods.getDiscount().getDiscount())));
+            response.setSchedule(master.getScheduleList());
+
+            return response;
+        }
     }
 }

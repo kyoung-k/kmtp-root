@@ -109,12 +109,12 @@ public class ReservationCompositeHandler {
 
     public Mono<ServerResponse> detail(ServerRequest request) {
 
-        final Mono<List<Schedule>> scheduleListMono = request.queryParam("masterId")
+        final Mono<Master> masterMono = request.queryParam("masterId")
                 .map(Mono::just)
                 .orElseGet(Mono::empty)
-                .flatMap(masterId -> WebClientHandler.build(ApiInfo.SCHEDULE_GET)
+                .flatMap(masterId -> WebClientHandler.build(ApiInfo.MASTER_GET)
                         .uriVariables(masterId)
-                        .monoList(Schedule.class));
+                        .mono(Master.class));
 
         final Mono<Goods> goodsMono = request.queryParam("goodsId")
                 .map(Mono::just)
@@ -130,19 +130,16 @@ public class ReservationCompositeHandler {
                         .uriVariables(itemId)
                         .mono(Item.class));
 
-        final Mono<ReservationDetail.Response> responseMono = Mono.zip(scheduleListMono, goodsMono, itemMono)
+        final Mono<ReservationDetail.Response> responseMono = Mono.zip(masterMono, goodsMono, itemMono)
                 .flatMap(tuple3 -> {
 
-                    ReservationDetail.Response response = new ReservationDetail.Response();
-
-                    response.setMasterId(tuple3.getT2().getMasterId());
-                    response.setGoodsId(tuple3.getT2().getId());
-                    response.setItemId(tuple3.getT3().getId());
+                    ReservationDetail.Response response = ReservationDetail.Response
+                            .setDetail(tuple3.getT1(), tuple3.getT2(), tuple3.getT3());
 
                     return Mono.just(response);
                 });
 
-        return ResponseHandler.noContent(Mono.empty());
+        return ResponseHandler.ok(responseMono);
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {
