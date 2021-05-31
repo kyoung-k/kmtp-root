@@ -14,14 +14,12 @@ public interface ReservationRepository extends ReactiveCrudRepository<Reservatio
             Long masterId
             , Long scheduleId
             , Long itemId
-            , LocalDate startDate
-            , LocalDate endDate);
+            , LocalDate endDate
+            , LocalDate startDate);
 
     Flux<ReservationEntity> findByMasterIdAndItemIdAndStartDateBeforeAndEndDateAfter(
             Long masterId
             , Long itemId
-            , LocalDate startDate
-            , LocalDate endDate);
-
-    Flux<ReservationEntity> findByStartDateLessThanEqualOrEndDateGreaterThanEqual(LocalDate startDate, LocalDate endDate);
+            , LocalDate endDate
+            , LocalDate startDate);
 }

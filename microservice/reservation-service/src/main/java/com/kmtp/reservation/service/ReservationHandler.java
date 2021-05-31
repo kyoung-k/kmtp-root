@@ -54,17 +54,12 @@ public class ReservationHandler {
                 .map(Mono::just)
                 .orElseGet(Mono::empty);
 
-        reservationRepository.findByStartDateLessThanEqualOrEndDateGreaterThanEqual(
-                LocalDate.of(2021, 6, 19), LocalDate.of(2021, 6, 20))
-                .doOnNext(System.out::println)
-                .subscribe();
-
         Mono<List<Reservation>> reservationMono = Mono.zip(masterIdMono, itemIdMono, startDateMono, endDateMono)
                 .flatMapMany(tuple4 -> reservationRepository.findByMasterIdAndItemIdAndStartDateBeforeAndEndDateAfter(
                         tuple4.getT1()
                         , tuple4.getT2()
-                        , tuple4.getT3()
-                        , tuple4.getT4()))
+                        , tuple4.getT4()
+                        , tuple4.getT3()))
                 .collectList()
                 .map(ReservationMapper.INSTANCE::entityListToApiList);
 
@@ -79,8 +74,8 @@ public class ReservationHandler {
                         reservation.getMasterId()
                         , reservation.getScheduleId()
                         , reservation.getItemId()
-                        , reservation.getStartDate()
-                        , reservation.getEndDate())
+                        , reservation.getEndDate()
+                        , reservation.getStartDate())
                         .doOnNext(reservationEntity -> Optional.of(reservationEntity)
                                 .ifPresent(optional -> GenericError.error(HttpStatus.BAD_REQUEST, "Reservations cannot be made on that date.")))
                         .switchIfEmpty(Mono.defer(() -> Mono.just(ReservationMapper.INSTANCE.apiToEntity(reservation)))))
