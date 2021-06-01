@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.common.http;
+package com.kmtp.common.http.error;
 
 import lombok.Builder;
 import lombok.Data;

@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kmtp.common.http;
+package com.kmtp.common.http.error;
 
+import com.kmtp.common.http.HttpInfo;
 import com.kmtp.common.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

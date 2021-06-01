@@ -67,6 +67,7 @@ public class MemberHandler {
     public Mono<ServerResponse> put(ServerRequest request) {
 
         final Long id = Long.parseLong(request.pathVariable("id"));
+
         final Mono<Member> memberMono = request.bodyToMono(Member.class)
                 .doOnNext(member -> genericValidator.validate(member, Member.class));
 

@@ -15,6 +15,7 @@
  */
 package com.kmtp.master.persistence;
 
+import com.kmtp.common.api.MasterType;
 import com.kmtp.common.generic.GenericEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,6 +36,8 @@ public class MasterEntity extends GenericEntity<MasterEntity> {
     private Long id;
     @Version
     private Long version;
+    @Column("master_type")
+    private MasterType masterType;
     @Column("name")
     private String name;
     @Column("information")

@@ -1,5 +1,6 @@
 package com.kmtp.reservation.service;
 
+import com.kmtp.common.api.Master;
 import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.ResponseHandler;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -32,38 +34,30 @@ public class ReservationHandler {
         this.genericValidator = genericValidator;
     }
 
-    public Mono<ServerResponse> checkList(ServerRequest request) {
+    public Mono<ServerResponse> consecutiveCheck(ServerRequest request) {
 
-        Mono<Long> masterIdMono = request.queryParam("masterId")
+        final Long masterId = request.queryParam("masterId")
                 .map(Long::parseLong)
-                .map(Mono::just)
-                .orElseGet(Mono::empty);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param master-id is required."));
 
-        Mono<Long> itemIdMono = request.queryParam("itemId")
+        final Long itemId = request.queryParam("itemId")
                 .map(Long::parseLong)
-                .map(Mono::just)
-                .orElseGet(Mono::empty);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param item-id is required."));
 
-        Mono<LocalDate> startDateMono = request.queryParam("startDate")
-                .map(startDate -> LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE))
-                .map(Mono::just)
-                .orElseGet(Mono::empty);
+        final LocalDate startDate = request.queryParam("startDate")
+                .map(date -> LocalDate.parse(date, DateTimeFormatter.ISO_DATE))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param start-date is required."));
 
-        Mono<LocalDate> endDateMono = request.queryParam("endDate")
-                .map(endDate -> LocalDate.parse(endDate, DateTimeFormatter.ISO_DATE))
-                .map(Mono::just)
-                .orElseGet(Mono::empty);
+        final LocalDate endDate = request.queryParam("endDate")
+                .map(date -> LocalDate.parse(date, DateTimeFormatter.ISO_DATE))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param end-date is required."));
 
-        Mono<List<Reservation>> reservationMono = Mono.zip(masterIdMono, itemIdMono, startDateMono, endDateMono)
-                .flatMapMany(tuple4 -> reservationRepository.findByMasterIdAndItemIdAndStartDateBeforeAndEndDateAfter(
-                        tuple4.getT1()
-                        , tuple4.getT2()
-                        , tuple4.getT4()
-                        , tuple4.getT3()))
+        Mono<List<Reservation>> checkListMono = reservationRepository.findByMasterIdAndItemIdAndStartDateBeforeAndEndDateAfter(
+                masterId, itemId, endDate, startDate)
                 .collectList()
                 .map(ReservationMapper.INSTANCE::entityListToApiList);
 
-        return ResponseHandler.ok(reservationMono);
+        return ResponseHandler.ok(checkListMono);
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {

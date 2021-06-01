@@ -15,11 +15,11 @@
  */
 package com.kmtp.master.service;
 
+import com.kmtp.common.api.Master;
 import com.kmtp.common.api.Schedule;
 import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.ResponseHandler;
-import com.kmtp.common.api.Master;
 import com.kmtp.master.persistence.MasterEntity;
 import com.kmtp.master.persistence.MasterRepository;
 import com.kmtp.master.persistence.ScheduleRepository;

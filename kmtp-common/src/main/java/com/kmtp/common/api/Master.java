@@ -20,6 +20,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -28,6 +29,8 @@ import java.util.List;
 public class Master {
 
     private Long id;
+    @NotNull
+    private MasterType masterType;
     @NotBlank
     private String name;
     private String information;

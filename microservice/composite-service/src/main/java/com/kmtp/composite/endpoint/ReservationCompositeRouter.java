@@ -16,7 +16,6 @@
 package com.kmtp.composite.endpoint;
 
 import com.kmtp.common.filter.FunctionalApiExceptionFilter;
-import com.kmtp.common.http.ResponseErrorHandler;
 import com.kmtp.composite.service.ReservationCompositeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +23,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 
 @Configuration
 public class ReservationCompositeRouter {

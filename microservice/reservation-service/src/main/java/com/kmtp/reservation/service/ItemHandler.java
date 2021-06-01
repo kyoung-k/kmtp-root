@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -35,29 +36,23 @@ public class ItemHandler {
 
     public Mono<ServerResponse> list(ServerRequest request) {
 
-        final Mono<Long> masterIdMono = request.queryParam("masterId")
+        final Long masterId = request.queryParam("masterId")
                 .map(Long::parseLong)
-                .map(Mono::just)
-                .orElseGet(Mono::empty);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param master-id is required."));
 
-        final Mono<List<Item>> itemList = masterIdMono
-                .switchIfEmpty(GenericError.of(HttpStatus.BAD_REQUEST, "query param master-id is required."))
-                .flatMapMany(masterId -> {
+        final Flux<Item> itemFlux = itemRepository.findByMasterId(masterId)
+                .map(ItemMapper.INSTANCE::entityToApi);
 
-                    final Flux<Item> itemFlux = itemRepository.findByMasterId(masterId)
-                            .map(ItemMapper.INSTANCE::entityToApi);
+        final Flux<Charge> chargeFlux = chargeRepository.findByMasterId(masterId)
+                .map(ChargeMapper.INSTANCE::entityToApi);
 
-                    final Flux<Charge> chargeFlux = chargeRepository.findByMasterId(masterId)
-                            .map(ChargeMapper.INSTANCE::entityToApi);
-
-                    return Flux.zip(itemFlux, chargeFlux)
-                            .flatMap(tuple2 -> {
-                                tuple2.getT1().setCharge(tuple2.getT2());
-                                return Mono.just(tuple2.getT1());
-                            });
+        Mono<List<Item>> listMono = Flux.zip(itemFlux, chargeFlux)
+                .flatMap(tuple2 -> {
+                    tuple2.getT1().setCharge(tuple2.getT2());
+                    return Mono.just(tuple2.getT1());
                 }).collectList();
 
-        return ResponseHandler.ok(itemList);
+        return ResponseHandler.ok(listMono);
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
@@ -108,6 +103,7 @@ public class ItemHandler {
     public Mono<ServerResponse> put(ServerRequest request) {
 
         final Long id = Long.parseLong(request.pathVariable("id"));
+
         final Mono<Item> itemMono = request.bodyToMono(Item.class)
                 .doOnNext(item -> genericValidator.validate(item, Item.class))
                 .doOnNext(item -> genericValidator.validate(item.getCharge(), Charge.class));

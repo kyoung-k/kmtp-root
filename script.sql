@@ -102,11 +102,13 @@ create table masters
     id          bigint auto_increment
         primary key,
     version     int,
+    master_type varchar(100) not null,
     name        varchar(100) not null,
     information varchar(500) null
 );
 
-INSERT INTO kmtp.masters (id, version, name, information) VALUES (1, 0, 'KYoung Hotel', '기영이 호텔');
+INSERT INTO kmtp.masters (id, version, master_type, name, information) VALUES (1, 0, 'CONSECUTIVE', 'KYoung Hotel', '기영이 호텔');
+INSERT INTO kmtp.masters (id, version, master_type, name, information) VALUES (2, 0, 'NONCONSECUTIVE', 'KYoung Hair', '기영이 미용실');
 
 drop table members;
 create table members
@@ -150,3 +152,7 @@ create table schedules
 );
 
 INSERT INTO kmtp.schedules (id, version, master_id, start_time, end_time) VALUES (1, 0, 1, '00:00', '24:00');
+INSERT INTO kmtp.schedules (id, version, master_id, start_time, end_time) VALUES (2, 0, 2, '10:00', '12:00');
+INSERT INTO kmtp.schedules (id, version, master_id, start_time, end_time) VALUES (3, 0, 2, '14:00', '16:00');
+INSERT INTO kmtp.schedules (id, version, master_id, start_time, end_time) VALUES (4, 0, 2, '16:00', '18:00');
+INSERT INTO kmtp.schedules (id, version, master_id, start_time, end_time) VALUES (5, 0, 2, '18:00', '20:00');

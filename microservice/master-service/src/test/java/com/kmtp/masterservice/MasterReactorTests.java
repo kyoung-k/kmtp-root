@@ -4,6 +4,7 @@ import com.kmtp.common.api.Schedule;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public class MasterReactorTests {
     void complementOfSet() {
 
         List<Long> lista = List.of(1l, 2l, 3l, 4l);
-        List<Long> listb = List.of(2l, 3l);
+        List<Long> listb = Collections.EMPTY_LIST;
 
 
         System.out.println(lista.stream()

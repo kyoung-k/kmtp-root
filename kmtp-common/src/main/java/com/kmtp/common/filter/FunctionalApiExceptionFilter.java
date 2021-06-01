@@ -15,7 +15,7 @@
  */
 package com.kmtp.common.filter;
 
-import com.kmtp.common.http.ResponseErrorHandler;
+import com.kmtp.common.http.error.ResponseErrorHandler;
 import com.kmtp.common.validation.ValidationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFilterFunction;

@@ -15,11 +15,22 @@
  */
 package com.kmtp.common.api;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 public class ReservationDetail {
+
+    @Data
+    @Builder
+    public static class ScheduleCheck {
+        private Long masterId;
+        private Long itemId;
+        private Long scheduleId;
+        private String startDate;
+        private String endDate;
+    }
 
     @Data
     public static class Response {
@@ -28,6 +39,7 @@ public class ReservationDetail {
         private Long itemId;
         private Long goodsId;
 
+        private MasterType masterType;
         private String masterName;
         private String itemName;
         private String goodsName;
@@ -44,6 +56,7 @@ public class ReservationDetail {
             response.setItemId(item.getId());
             response.setGoodsId(goods.getId());
 
+            response.setMasterType(master.getMasterType());
             response.setMasterName(master.getName());
             response.setItemName(item.getName());
             response.setGoodsName(goods.getName());
