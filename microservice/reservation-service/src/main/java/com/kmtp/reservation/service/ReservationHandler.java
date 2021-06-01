@@ -1,10 +1,9 @@
 package com.kmtp.reservation.service;
 
-import com.kmtp.common.api.Master;
+import com.kmtp.common.api.Reservation;
 import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.generic.GenericValidator;
 import com.kmtp.common.http.ResponseHandler;
-import com.kmtp.common.api.Reservation;
 import com.kmtp.reservation.persistence.ReservationEntity;
 import com.kmtp.reservation.persistence.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -71,6 +71,12 @@ public class WebClientHandler {
                         .collect(Collectors.toList()));
     }
 
+    public Mono<String> jsonString() {
+        return MethodType.valueOf(this.apiInfo.getHttpMethod().name())
+                .function.apply(this)
+                .bodyToMono(String.class);
+    }
+
     private <T> Mono<HttpInfo<T>> exchange(Class<T> clazz) {
         return MethodType.valueOf(this.apiInfo.getHttpMethod().name())
                 .function.apply(this)
@@ -98,11 +104,11 @@ public class WebClientHandler {
 
         private final Function<WebClientHandler, WebClient.ResponseSpec> function;
 
-        private final static WebClient getWebClient() {
+        private static WebClient getWebClient() {
             return WebClient.builder().baseUrl("http://localhost").build();
         }
 
-        private final static URI createUri(UriBuilder uriBuilder, WebClientHandler webClientHandler) {
+        private static URI createUri(UriBuilder uriBuilder, WebClientHandler webClientHandler) {
 
             uriBuilder.port(webClientHandler.apiInfo.getPort())
                     .path(webClientHandler.apiInfo.getPath());

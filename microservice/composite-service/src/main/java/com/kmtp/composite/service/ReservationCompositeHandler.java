@@ -181,8 +181,4 @@ public class ReservationCompositeHandler {
 
         return ResponseHandler.ok(responseMono);
     }
-
-    public Mono<ServerResponse> post(ServerRequest request) {
-        return null;
-    }
 }
