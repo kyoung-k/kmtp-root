@@ -32,6 +32,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -113,6 +116,15 @@ public class ReservationCompositeHandler {
                 });
 
         return ResponseHandler.ok(responseFlux.collectList());
+    }
+
+    public Mono<ServerResponse> calendarList(ServerRequest request) {
+
+        final YearMonth yearMonth = request.queryParam("yearMonth")
+                .map(YearMonth::parse)
+                .orElseGet(YearMonth::now);
+
+        return ResponseHandler.ok(Mono.empty());
     }
 
     public Mono<ServerResponse> detail(ServerRequest request) {

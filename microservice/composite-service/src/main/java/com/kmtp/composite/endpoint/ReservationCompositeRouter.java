@@ -39,10 +39,10 @@ public class ReservationCompositeRouter {
     @Bean
     public RouterFunction<ServerResponse> reservationCompositeRoutes() {
         return RouterFunctions.route()
-                .GET("/api/goodsList/{masterId}", reservationCompositeHandler::goodsList)
-                .GET("/api/itemList/{masterId}", reservationCompositeHandler::itemList)
+                .GET("/api/goods-list/{masterId}", reservationCompositeHandler::goodsList)
+                .GET("/api/item-list/{masterId}", reservationCompositeHandler::itemList)
+                .GET("/api/calendar-list/{masterId}", reservationCompositeHandler::calendarList)
                 .GET("/api/reservation", reservationCompositeHandler::detail)
-                .POST("/api/reservation", reservationCompositeHandler::post)
                 .filter(functionalApiExceptionFilter.exceptionHandler())
                 .build();
     }
