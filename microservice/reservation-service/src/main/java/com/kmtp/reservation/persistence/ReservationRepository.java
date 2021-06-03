@@ -22,4 +22,9 @@ public interface ReservationRepository extends ReactiveCrudRepository<Reservatio
             , Long itemId
             , LocalDate endDate
             , LocalDate startDate);
+
+    Mono<Integer> countByMasterIdAndItemIdAndStartDate(
+            Long masterId
+            , Long itemId
+            , LocalDate startDate);
 }

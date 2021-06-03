@@ -31,15 +31,13 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -56,7 +54,7 @@ public class ReservationCompositeHandler {
             put("masterId", Collections.singletonList(request.pathVariable("masterId")));
         }};
 
-        Flux<ItemList.Response> responseFlux = WebClientHandler.build(ApiInfo.ITEM_LIST)
+        final Flux<ItemList.Response> responseFlux = WebClientHandler.build(ApiInfo.ITEM_LIST)
                 .queryParam(paramMap)
                 .monoList(Item.class)
                 .flatMapMany(Flux::fromIterable)
@@ -120,11 +118,57 @@ public class ReservationCompositeHandler {
 
     public Mono<ServerResponse> calendarList(ServerRequest request) {
 
+        final String masterId = request.pathVariable("masterId");
+
         final YearMonth yearMonth = request.queryParam("yearMonth")
                 .map(YearMonth::parse)
                 .orElseGet(YearMonth::now);
 
-        return ResponseHandler.ok(Mono.empty());
+        final Mono<List<CalendarList.Response>> responseMono = CalendarList.CalendarBuilder.of(yearMonth)
+                .flatMap(calendar -> {
+
+                    final MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>() {{
+                        put("masterId", Collections.singletonList(masterId));
+                    }};
+
+                    final Mono<List<Item>> itemMonoList = WebClientHandler.build(ApiInfo.ITEM_LIST)
+                            .queryParam(paramMap)
+                            .monoList(Item.class)
+                            .flatMapMany(Flux::fromIterable)
+                            .flatMap(item -> {
+
+                                final MultiValueMap<String, String> dateCheckParamMap = new LinkedMultiValueMap<>() {{
+                                    put("masterId", Collections.singletonList(masterId));
+                                    put("itemId", Collections.singletonList(String.valueOf(item.getId())));
+                                    put("startDate", Collections.singletonList(calendar.getDate().format(DateTimeFormatter.ISO_DATE)));
+                                }};
+
+                                final Mono<Integer> countMono = WebClientHandler.build(ApiInfo.RESERVATION_DATE_CHECK)
+                                        .queryParam(dateCheckParamMap)
+                                        .mono(Integer.class);
+
+                                return Mono.zip(Mono.just(item), countMono);
+                            })
+                            .filter(tuple2 -> tuple2.getT2() <= 0)
+                            .flatMap(tuple2 -> Mono.just(tuple2.getT1()))
+                            .collectList()
+                            .map(items -> items.stream()
+                                    .sorted(Comparator.comparingLong(Item::getId))
+                                    .collect(Collectors.toList()));
+
+                    return Mono.zip(Mono.just(calendar.getDate()), itemMonoList);
+                })
+                .flatMap(tuple2 -> Mono.just(CalendarList.Response
+                        .builder()
+                        .date(tuple2.getT1())
+                        .itemList(tuple2.getT2())
+                        .build()))
+                .collectList()
+                .map(responses -> responses.stream()
+                        .sorted(Comparator.comparing(CalendarList.Response::getDate))
+                        .collect(Collectors.toList()));
+
+        return ResponseHandler.ok(responseMono);
     }
 
     public Mono<ServerResponse> detail(ServerRequest request) {
@@ -159,7 +203,8 @@ public class ReservationCompositeHandler {
 
         final Mono<Goods> goodsMono = WebClientHandler.build(ApiInfo.GOODS_GET)
                 .uriVariables(goodsId)
-                .mono(Goods.class);
+                .mono(Goods.class)
+                .onErrorResume(throwable -> Mono.just(new Goods()));
 
         final Mono<ReservationDetail.Response> responseMono = Mono.zip(masterMono, goodsMono, itemMono)
                 .flatMap(tuple3 -> {
@@ -175,6 +220,7 @@ public class ReservationCompositeHandler {
                                     .endDate(endDate)
                                     .build();
 
+                    // TODO 2021-06-03
                     final Mono<List<ReservationDetail.ScheduleCheck>> checkListMono =
                             tuple3.getT1().getMasterType().getCheckFunction().apply(scheduleCheckRequest);
 

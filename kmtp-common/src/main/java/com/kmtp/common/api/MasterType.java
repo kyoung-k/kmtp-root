@@ -22,7 +22,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Mono;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -40,7 +39,7 @@ public enum MasterType {
                 multiValueMap.put("startDate", Collections.singletonList(param.getStartDate()));
                 multiValueMap.put("endDate", Collections.singletonList(param.getEndDate()));
 
-                return WebClientHandler.build(ApiInfo.RESERVATION_CONSECUTIVE_CHECK)
+                return WebClientHandler.build(ApiInfo.RESERVATION_PERIOD_CHECK)
                         .queryParam(multiValueMap)
                         .monoList(ReservationDetail.ScheduleCheck.class);
             }

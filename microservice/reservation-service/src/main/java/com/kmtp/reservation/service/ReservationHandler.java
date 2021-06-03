@@ -33,7 +33,7 @@ public class ReservationHandler {
         this.genericValidator = genericValidator;
     }
 
-    public Mono<ServerResponse> consecutiveCheck(ServerRequest request) {
+    public Mono<ServerResponse> periodCheck(ServerRequest request) {
 
         final Long masterId = request.queryParam("masterId")
                 .map(Long::parseLong)
@@ -51,12 +51,32 @@ public class ReservationHandler {
                 .map(date -> LocalDate.parse(date, DateTimeFormatter.ISO_DATE))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param end-date is required."));
 
-        Mono<List<Reservation>> checkListMono = reservationRepository.findByMasterIdAndItemIdAndStartDateBeforeAndEndDateAfter(
+        final Mono<List<Reservation>> checkListMono = reservationRepository.findByMasterIdAndItemIdAndStartDateBeforeAndEndDateAfter(
                 masterId, itemId, endDate, startDate)
                 .collectList()
                 .map(ReservationMapper.INSTANCE::entityListToApiList);
 
         return ResponseHandler.ok(checkListMono);
+    }
+
+    public Mono<ServerResponse> dateCheck(ServerRequest request) {
+
+        final Long masterId = request.queryParam("masterId")
+                .map(Long::parseLong)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param master-id is required."));
+
+        final Long itemId = request.queryParam("itemId")
+                .map(Long::parseLong)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param item-id is required."));
+
+        final LocalDate startDate = request.queryParam("startDate")
+                .map(date -> LocalDate.parse(date, DateTimeFormatter.ISO_DATE))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param start-date is required."));
+
+        final Mono<Integer> countMono = reservationRepository.countByMasterIdAndItemIdAndStartDate(
+                masterId, itemId, startDate);
+
+        return ResponseHandler.ok(countMono);
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {

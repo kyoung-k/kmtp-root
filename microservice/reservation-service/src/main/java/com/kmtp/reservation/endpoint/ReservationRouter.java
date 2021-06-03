@@ -24,7 +24,8 @@ public class ReservationRouter {
     @Bean
     public RouterFunction<ServerResponse> reservationRoutes() {
         return RouterFunctions.route()
-                .GET("/reservation/consecutiveCheck", reservationHandler::consecutiveCheck)
+                .GET("/reservation/period-check", reservationHandler::periodCheck)
+                .GET("/reservation/date-check", reservationHandler::dateCheck)
                 .POST("/reservation", reservationHandler::post)
                 .filter(functionalApiExceptionFilter.exceptionHandler())
                 .build();

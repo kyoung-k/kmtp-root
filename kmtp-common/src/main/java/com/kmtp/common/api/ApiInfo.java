@@ -54,7 +54,8 @@ public enum ApiInfo {
     ITEMGOODS_POST(HttpMethod.GET, 8882, "/itemGoods/{goodsId}"),
     ITEMGOODS_DELETE(HttpMethod.GET, 8882, "/itemGoods/{goodsId}"),
 
-    RESERVATION_CONSECUTIVE_CHECK(HttpMethod.GET, 8882, "/reservation/consecutiveCheck"),
+    RESERVATION_PERIOD_CHECK(HttpMethod.GET, 8882, "/reservation/period-check"),
+    RESERVATION_DATE_CHECK(HttpMethod.GET, 8882, "/reservation/date-check"),
     RESERVATION_POST(HttpMethod.POST, 8882, "/reservation"),
     ;
 

@@ -62,7 +62,7 @@ public class ReservationDetail {
             response.setGoodsName(goods.getName());
 
             response.setCharge(item.getCharge().getCharge());
-            response.setDiscountCharge((long) (item.getCharge().getCharge() - (item.getCharge().getCharge() * goods.getDiscount().getDiscount())));
+            response.setDiscountCharge((long) (item.getCharge().getCharge() - (item.getCharge().getCharge() * (goods.getDiscount() == null ? 0 : goods.getDiscount().getDiscount()))));
             response.setSchedule(master.getScheduleList());
 
             return response;
