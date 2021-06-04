@@ -27,9 +27,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class WebClientHandler {

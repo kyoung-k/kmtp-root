@@ -45,7 +45,18 @@ public enum MasterType {
             }
     ),
     NONCONSECUTIVE(
-            param -> Mono.empty()
+            param -> {
+
+                MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+
+                multiValueMap.put("masterId", Collections.singletonList(String.valueOf(param.getMasterId())));
+                multiValueMap.put("itemId", Collections.singletonList(String.valueOf(param.getItemId())));
+                multiValueMap.put("startDate", Collections.singletonList(param.getStartDate()));
+
+                return WebClientHandler.build(ApiInfo.RESERVATION_DATE_CHECK)
+                        .queryParam(multiValueMap)
+                        .monoList(ReservationDetail.ScheduleCheck.class);
+            }
     )
     ;
 

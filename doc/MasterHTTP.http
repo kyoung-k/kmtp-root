@@ -1,0 +1,96 @@
+
+# Master 조회
+# http://localhost:8881/master/{masterId}
+GET http://localhost:8881/master/1
+###
+
+# Master 등록
+POST http://localhost:8881/master
+Content-Type: application/json
+
+{
+  "masterType" : "NONCONSECUTIVE",
+  "name" : "KYoung Salon",
+  "information" : "기영이 살롱"
+}
+###
+
+# Master 수정
+# http://localhost:8881/master/{masterId}
+PUT http://localhost:8881/master/3
+Content-Type: application/json
+
+{
+  "id" : 3,
+  "name" : "KYoung Salon",
+  "information" : "기영이 살롱"
+}
+###
+
+# Master 삭제
+# http://localhost:8881/master/{masterId}
+DELETE http://localhost:8881/master/3
+###
+
+# Member 조회
+# http://localhost:8881/member/{memberId}
+GET http://localhost:8881/member/2
+###
+
+# Member 등록
+POST http://localhost:8881/member
+Content-Type: application/json
+
+{
+  "email" : "raone.k.0130@gmail.com",
+  "name" : "김라원",
+  "age" : 3,
+  "address" : "알콩달콩 어린이집"
+}
+###
+
+# Member 수정
+# http://localhost:8881/member/{memberId}
+PUT http://localhost:8881/member/2
+Content-Type: application/json
+
+{
+  "email" : "raone.k.0130@gmail.com",
+  "name" : "김라원",
+  "age" : 3,
+  "address" : "알콩달콩 어린이집"
+}
+###
+
+# Member 삭제
+# http://localhost:8881/member/{memberId}
+DELETE http://localhost:8881/member/2
+###
+
+# Schedule 조회
+# http://localhost:8881/schedule/{scheduleId}
+GET http://localhost:8881/schedule/3
+###
+
+# Schedule 등록
+POST http://localhost:8881/schedule/3
+Content-Type: application/json
+
+[
+  {
+    "masterId" : 3,
+    "startTime" : "10:00",
+    "endTime" : "11:00"
+  },
+  {
+    "masterId" : 3,
+    "startTime" : "11:00",
+    "endTime" : "12:00"
+  }
+]
+###
+
+# Schedule 삭제
+# http://localhost:8881/schedule/{masterId}
+DELETE http://localhost:8881/schedule/3
+###

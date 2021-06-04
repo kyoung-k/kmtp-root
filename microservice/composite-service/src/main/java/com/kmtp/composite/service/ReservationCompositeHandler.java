@@ -145,7 +145,8 @@ public class ReservationCompositeHandler {
 
                                 final Mono<Integer> countMono = WebClientHandler.build(ApiInfo.RESERVATION_DATE_CHECK)
                                         .queryParam(dateCheckParamMap)
-                                        .mono(Integer.class);
+                                        .monoList(ReservationDetail.ScheduleCheck.class)
+                                        .map(List::size);
 
                                 return Mono.zip(Mono.just(item), countMono);
                             })
@@ -220,7 +221,6 @@ public class ReservationCompositeHandler {
                                     .endDate(endDate)
                                     .build();
 
-                    // TODO 2021-06-03
                     final Mono<List<ReservationDetail.ScheduleCheck>> checkListMono =
                             tuple3.getT1().getMasterType().getCheckFunction().apply(scheduleCheckRequest);
 

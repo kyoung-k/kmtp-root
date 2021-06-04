@@ -22,13 +22,16 @@ create table charges
     charge  bigint       null
 );
 
-INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (1, 0, 1, 1, '101호 가격', 10000);
-INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (2, 0, 1, 2, '102호 가격', 10000);
-INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (3, 0, 1, 3, '103호 가격', 10000);
-INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (4, 0, 1, 4, '201호 가격', 12000);
-INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (5, 0, 1, 5, '202호 가격', 12000);
-INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (6, 0, 1, 6, '301호 가격', 15000);
-INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (7, 0, 1, 7, '302호 가격', 15000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (1, 0, 1, 1, '101호 가격', 100000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (2, 0, 1, 2, '102호 가격', 100000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (3, 0, 1, 3, '103호 가격', 100000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (4, 0, 1, 4, '201호 가격', 120000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (5, 0, 1, 5, '202호 가격', 120000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (6, 0, 1, 6, '301호 가격', 150000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (7, 0, 1, 7, '302호 가격', 150000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (8, 0, 2, 8, '302호 가격', 40000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (9, 0, 2, 9, '302호 가격', 40000);
+INSERT INTO kmtp.charges (id, version, master_id, item_id, name, charge) VALUES (10, 0, 2, 10, '302호 가격', 60000);
 
 drop table discounts;
 create table discounts
@@ -95,6 +98,9 @@ INSERT INTO kmtp.items (id, version, master_id, name) VALUES (4, 0, 1, '201호')
 INSERT INTO kmtp.items (id, version, master_id, name) VALUES (5, 0, 1, '202호');
 INSERT INTO kmtp.items (id, version, master_id, name) VALUES (6, 0, 1, '301호');
 INSERT INTO kmtp.items (id, version, master_id, name) VALUES (7, 0, 1, '302호');
+INSERT INTO kmtp.items (id, version, master_id, name) VALUES (8, 0, 2, '사진실 1호');
+INSERT INTO kmtp.items (id, version, master_id, name) VALUES (9, 0, 2, '사진실 2호');
+INSERT INTO kmtp.items (id, version, master_id, name) VALUES (10, 0, 2, '사진실 3호');
 
 drop table masters;
 create table masters

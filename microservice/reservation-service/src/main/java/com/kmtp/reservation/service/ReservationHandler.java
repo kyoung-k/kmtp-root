@@ -73,10 +73,12 @@ public class ReservationHandler {
                 .map(date -> LocalDate.parse(date, DateTimeFormatter.ISO_DATE))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "query param start-date is required."));
 
-        final Mono<Integer> countMono = reservationRepository.countByMasterIdAndItemIdAndStartDate(
-                masterId, itemId, startDate);
+        final Mono<List<Reservation>> checkListMono = reservationRepository.findByMasterIdAndItemIdAndStartDate(
+                masterId, itemId, startDate)
+                .collectList()
+                .map(ReservationMapper.INSTANCE::entityListToApiList);
 
-        return ResponseHandler.ok(countMono);
+        return ResponseHandler.ok(checkListMono);
     }
 
     public Mono<ServerResponse> post(ServerRequest request) {

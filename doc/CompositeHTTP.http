@@ -1,0 +1,19 @@
+
+# 상품 목록
+# http://localhost:8880/api/goods-list/{masterId}
+GET http://localhost:8880/api/goods-list/1
+###
+
+# 아이템 목록
+# http://localhost:8880/api/item-list/{masterId}
+GET http://localhost:8880/api/item-list/1
+###
+
+# 달력 예약 현황
+# http://localhost:8880/api/calendar-list/{masterId}?yearMonth={yearMonth}
+GET http://localhost:8880/api/calendar-list/1?yearMonth=2021-06
+###
+
+# 예약하기 상세화면
+# http://localhost:8880/api/reservation?masterId={masterId}&itemId={itemId}&startDate={startDate}&endDate={endDate}
+GET http://localhost:8880/api/reservation?masterId=2&itemId=8&startDate=2021-06-10&endDate=2021-06-10
