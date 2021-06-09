@@ -21,7 +21,7 @@ public class ScheduleRouter {
     @Bean
     public RouterFunction<ServerResponse> scheduleRoutes() {
         return RouterFunctions.route()
-                .GET("/schedule/{masterId}", scheduleHandler::findById)
+                .GET("/schedule/{masterId}", scheduleHandler::get)
                 .POST("/schedule/{masterId}", scheduleHandler::post)
                 .DELETE("/schedule/{masterId}", scheduleHandler::delete)
                 .build();

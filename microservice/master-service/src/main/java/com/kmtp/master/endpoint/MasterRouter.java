@@ -19,7 +19,6 @@ import com.kmtp.common.filter.FunctionalApiExceptionFilter;
 import com.kmtp.master.service.MasterHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;

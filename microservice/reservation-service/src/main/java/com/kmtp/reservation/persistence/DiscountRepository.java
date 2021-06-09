@@ -8,9 +8,24 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface DiscountRepository extends ReactiveCrudRepository<DiscountEntity, Long> {
 
+    /**
+     * 할인율 정보를 조회합니다.
+     * @param masterId 마스터 ID
+     * @return {@link Flux}<{@link DiscountEntity}></{@link>
+     */
     Flux<DiscountEntity> findByMasterId(Long masterId);
 
-    Mono<DiscountEntity> findByGoodsId(Long id);
+    /**
+     * 할인율 정보를 조회합니다.
+     * @param goodsId 상품 ID
+     * @return {@link Mono}<{@link DiscountEntity}></{@link>
+     */
+    Mono<DiscountEntity> findByGoodsId(Long goodsId);
 
-    Mono<Void> deleteByGoodsId(Long id);
+    /**
+     * 할인율 정보를 삭제합니다.
+     * @param goodsId 상품 ID
+     * @return {@link Mono}<{@link Void}></{@link>
+     */
+    Mono<Void> deleteByGoodsId(Long goodsId);
 }

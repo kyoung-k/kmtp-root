@@ -6,7 +6,7 @@ GET http://localhost:8880/api/goods-list/1
 
 # 아이템 목록
 # http://localhost:8880/api/item-list/{masterId}
-GET http://localhost:8880/api/item-list/1
+GET http://localhost:8880/api/item-list/3
 ###
 
 # 달력 예약 현황

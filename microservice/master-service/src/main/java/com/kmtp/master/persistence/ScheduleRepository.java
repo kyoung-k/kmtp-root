@@ -23,7 +23,17 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface ScheduleRepository extends ReactiveCrudRepository<ScheduleEntity, Long> {
 
+    /**
+     * 마스터의 스케쥴 목록을 조회합니다.
+     * @param masterId 마스터 ID
+     * @return {@link Flux}<{@link ScheduleEntity}></{@link>
+     */
     Flux<ScheduleEntity> findByMasterId(Long masterId);
 
+    /**
+     * 마스터의 스케쥴 목록을 삭제합니다.
+     * @param masterId 마스터 ID
+     * @return {@link Mono}<{@link Void}></{@link>
+     */
     Mono<Void> deleteByMasterId(Long masterId);
 }

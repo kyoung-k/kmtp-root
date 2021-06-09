@@ -52,20 +52,35 @@ public class MasterHandler {
         this.genericValidator = genericValidator;
     }
 
+    /**
+     * 마스터, 마스터의 스케쥴 목록을 조회합니다.<br>
+     * <p></p>
+     * (1) id값을 path variable에서 조회합니다.<br>
+     * (2) 마스터 정보를 조회한뒤 응답 객체로 변환합니다.<br> 마스터 정보가 없을경우 {@link HttpStatus#NOT_FOUND} 상태로 응답합니다.<br>
+     * (3) 스케쥴 정보를 조회한뒤 응답 객체료 변환합니다.<br> 스케쥴 정보가 없을경우 {@link HttpStatus#NOT_FOUND} 상태로 응답합니다.<br>
+     * (4) 마스터, 스케쥴 정보를 {@link Mono#zip} 처리합니다.
+     * <p></p>
+     * @param request {@link ServerRequest}
+     * @return {@link Mono}<{@link Master}></{@link>
+     */
     public Mono<ServerResponse> get( ServerRequest request ) {
 
+        // (1)
         final Long id = Long.parseLong( request.pathVariable("id") );
 
-        Mono<Master> masterMono = masterRepository.findById(id)
+        // (2)
+        final Mono<Master> masterMono = masterRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found master-id."))
                 .map(MasterMapper.INSTANCE::entityToApi);
 
-        Mono<List<Schedule>> scheduleListMono = scheduleRepository.findByMasterId(id)
+        // (3)
+        final Mono<List<Schedule>> scheduleListMono = scheduleRepository.findByMasterId(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found master schedule"))
                 .collectList()
                 .map(ScheduleMapper.INSTANCE::entityListToApiList);
 
-        Mono<Master> responseMono = Mono.zip(masterMono, scheduleListMono)
+        // (4)
+        final Mono<Master> responseMono = Mono.zip(masterMono, scheduleListMono)
                 .flatMap(tuple2 -> {
                     tuple2.getT1().setScheduleList(tuple2.getT2());
                     return Mono.just(tuple2.getT1());
@@ -74,9 +89,18 @@ public class MasterHandler {
         return ResponseHandler.ok(responseMono);
     }
 
+    /**
+     * 마스터 정보를 등록합니다.
+     * <p></p>
+     * (1) request body 정보를 변환한뒤 유효성 체크를 진행합니다. Entity 객체로 변한한뒤 DB에 등록합니다.
+     * <p></p>
+     * @param request {@link ServerRequest}
+     * @return {@link HttpStatus#CREATED}
+     */
     public Mono<ServerResponse> post( ServerRequest request ) {
 
-        Mono<MasterEntity> saveMasterMono = request.bodyToMono(Master.class)
+        // (1)
+        final Mono<MasterEntity> saveMasterMono = request.bodyToMono(Master.class)
                 .doOnNext(master -> genericValidator.validate(master, Master.class))
                 .map(MasterMapper.INSTANCE::apiToEntity)
                 .flatMap(masterRepository::save);
@@ -84,16 +108,32 @@ public class MasterHandler {
         return ResponseHandler.created(saveMasterMono, URI.create(request.path()));
     }
 
+    /**
+     * 마스터 정보를 수정합니다.
+     * <p></p>
+     * (1) id값을 path variable에서 조회합니다.<br>
+     * (2) request body 정보를 변환한뒤 유효성 체크를 진행합니다.<br>
+     * (3) 마스터 정보를 DB에서 조회합니다.<br> 마스터 정보가 없을경우 {@link HttpStatus#NOT_FOUND} 상태로 응답합니다.<br>
+     * (4) request 정보와 DB 정보를 {@link Mono#zip} 하여 수정할 정보를 설정하고 DB에 저장합니다.
+     * <p></p>
+     * @param request {@link ServerRequest}
+     * @return {@link HttpStatus#NO_CONTENT}
+     */
     public Mono<ServerResponse> put( ServerRequest request ) {
 
+        // (1)
         final Long id = Long.parseLong(request.pathVariable("id"));
+
+        // (2)
         final Mono<Master> masterMono = request.bodyToMono(Master.class)
                 .doOnNext(master -> genericValidator.validate(master, Master.class));
 
+        // (3)
         final Mono<MasterEntity> masterEntityMono = masterRepository.findById(id)
-                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found item-id"));
+                .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found master"));
 
-        Mono<MasterEntity> updateMasterMono = Mono.zip(masterMono, masterEntityMono)
+        // (4)
+        final Mono<MasterEntity> updateMasterMono = Mono.zip(masterMono, masterEntityMono)
                 .flatMap(tuple2 -> {
 
                     tuple2.getT2().change(masterEntity -> {
@@ -108,10 +148,21 @@ public class MasterHandler {
         return ResponseHandler.noContent(updateMasterMono);
     }
 
+    /**
+     * 마스터 정보를 삭제합니다.<br>
+     * <p></p>
+     * (1) id값을 path variable에서 조회합니다.<br>
+     * (2) 마스터 정보를 DB에서 조회합니다.<br> 마스터 정보가 없을경우 {@link HttpStatus#NOT_FOUND} 상태로 응답합니다.<br> 조회된 마스터 정보를 삭제합니다.
+     * <p></p>
+     * @param request {@link ServerRequest}
+     * @return {@link HttpStatus#NO_CONTENT}
+     */
     public Mono<ServerResponse> delete(ServerRequest request) {
 
+        // (1)
         final Long id = Long.parseLong( request.pathVariable("id") );
 
+        // (2)
         final Mono<Void> deleteMasterMono = masterRepository.findById(id)
                 .switchIfEmpty(GenericError.of(HttpStatus.NOT_FOUND, "not found master-id."))
                 .then(masterRepository.deleteById(id));
