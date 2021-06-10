@@ -19,6 +19,10 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * 아이템 기준 목록의 API POJO class 입니다.
+ * @author KYoung
+ */
 public class ItemList {
 
     @Data

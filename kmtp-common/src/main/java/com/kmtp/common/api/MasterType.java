@@ -26,9 +26,25 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * 마스터 타입 enum class 입니다.<br>
+ *
+ * <p>
+ * CONSECUTIVE :
+ * 1일 이상 예약이 가능한 타입 입니다.<br>
+ * 예약기간으로 예약확인 처리를 {@link FunctionalInterface}로 정의합니다.
+ * </p>
+ *
+ * <p>
+ * NONCONSECUTIVE :
+ * 1일 이상 예약이 불가능한 타입 입니다.<br>
+ * 예약날짜로 예약확인 처리를 {@link FunctionalInterface}로 정의합니다.
+ * </p>
+ */
 @Getter
 @AllArgsConstructor
 public enum MasterType {
+
     CONSECUTIVE(
             param -> {
 
@@ -60,5 +76,6 @@ public enum MasterType {
     )
     ;
 
+    // 예약확인 처리 function
     private Function<ReservationDetail.ScheduleCheck, Mono<List<ReservationDetail.ScheduleCheck>>> checkFunction;
 }

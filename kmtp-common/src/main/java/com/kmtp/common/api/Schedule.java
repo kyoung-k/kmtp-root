@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * 스케쥴 POJO class 입니다.
+ */
 @Data
 @Builder
 @AllArgsConstructor

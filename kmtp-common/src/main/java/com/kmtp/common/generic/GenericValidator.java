@@ -24,6 +24,12 @@ import org.springframework.validation.Validator;
 
 import java.util.List;
 
+/**
+ * Request 요청에 대한 유효성 확인을 처리하는 class 입니다.
+ * {@link Validator}를 사용해서 유효성 검사를 처리합니다. WebFlux Functional Endpoint에서 사용 합니다.
+ * @see <a href="https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/validation.html">Spring validation</a>
+ * @author KYoung
+ */
 @Component
 public class GenericValidator {
 
@@ -34,6 +40,13 @@ public class GenericValidator {
         this.validator = validator;
     }
 
+    /**
+     * {@link Validator} 인터페이스를 사용해서 유효성을 검사한다.<br>
+     * Error가 발생하면 에러처리를 {@link ValidationErrorHandler}에 위임한다.
+     * @param api POJO
+     * @param elementClass POJO {@link Class}
+     * @param <T> POJO
+     */
     public <T> void validate(T api, Class<? extends T> elementClass) {
 
         Errors errors = new BeanPropertyBindingResult(api, elementClass.getName());
@@ -44,6 +57,14 @@ public class GenericValidator {
         }
     }
 
+    /**
+     * {@link Validator} 인터페이스를 사용해서 유효성을 검사한다.<br>
+     * Error가 발생하면 에러처리를 {@link ValidationErrorHandler}에 위임한다.<br>
+     * TODO 분석 설계를 통해 목록에 대한 에러처리를 고민해보자.
+     * @param list POJO
+     * @param elementClass POJO {@link Class}
+     * @param <T> POJO
+     */
     public <T> void validateList(List<T> list, Class<? extends T> elementClass) {
 
         // TODO List Validation index 처리

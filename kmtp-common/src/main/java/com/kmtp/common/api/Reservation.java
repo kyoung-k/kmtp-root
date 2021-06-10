@@ -22,6 +22,10 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
+/**
+ * 예약 POJO class 입니다.
+ * @author KYoung
+ */
 @Data
 @Builder
 @AllArgsConstructor

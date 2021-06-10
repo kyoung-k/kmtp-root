@@ -23,6 +23,10 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+/**
+ * 상품 POJO class 입니다.
+ * @author KYoung
+ */
 @Data
 @Builder
 @AllArgsConstructor

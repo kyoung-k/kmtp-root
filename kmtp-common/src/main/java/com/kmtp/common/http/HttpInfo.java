@@ -17,11 +17,17 @@ package com.kmtp.common.http;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 
+/**
+ * Http Response POJO
+ * <p>
+ *     기본 응답 템플릿 입니다.
+ * </p>
+ * @param <T> POJO
+ */
 @Data
 @Builder
 public class HttpInfo<T> {

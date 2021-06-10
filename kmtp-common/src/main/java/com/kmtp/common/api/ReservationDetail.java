@@ -20,8 +20,15 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * 예약하기 상세 API POJO class 입니다.
+ * @author KYoung
+ */
 public class ReservationDetail {
 
+    /**
+     * 예약확인 POJO class 입니다.
+     */
     @Data
     @Builder
     public static class ScheduleCheck {
@@ -32,6 +39,9 @@ public class ReservationDetail {
         private String endDate;
     }
 
+    /**
+     * 예약하기 상세 API Response POJO class 입니다.
+     */
     @Data
     public static class Response {
 
@@ -48,6 +58,14 @@ public class ReservationDetail {
         private Long discountCharge;
         private List<Schedule> schedule;
 
+        /**
+         * {@link Master}, {@link Goods}, {@link Item} 정보를 설정합니다.
+         *
+         * @param master {@link Master}
+         * @param goods {@link Goods}
+         * @param item {@link Item}
+         * @return {@link ReservationDetail.Response}
+         */
         public static ReservationDetail.Response setDetail(Master master, Goods goods, Item item) {
 
             ReservationDetail.Response response = new ReservationDetail.Response();

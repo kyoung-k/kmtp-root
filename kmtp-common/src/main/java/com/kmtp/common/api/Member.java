@@ -19,6 +19,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * 회원 POJO class 입니다.
+ * @author KYoung
+ */
 @Data
 @Builder
 @AllArgsConstructor

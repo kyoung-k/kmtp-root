@@ -17,6 +17,10 @@ package com.kmtp.common.validation;
 
 import java.util.List;
 
+/**
+ * 유효성 검사 Response처리를 위한 사용자 정의 Exception 입니다.
+ * @author KYoung
+ */
 public class ValidationException extends RuntimeException {
 
     final private List<ValidationError> errorsList;

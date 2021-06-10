@@ -22,8 +22,19 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Spring Webflux Request helper class
+ * @author KYoung
+ */
 public class RequestHandler {
 
+    /**
+     *
+     * @param request {@link ServerRequest}
+     * @param elementClass {@link Class}*
+     * @param <T> POJO
+     * @return {@link Mono}
+     */
     public static <T> Mono<List<T>> jsonBodyToList(ServerRequest request, Class<T[]> elementClass) {
 
         return request.bodyToMono(String.class)

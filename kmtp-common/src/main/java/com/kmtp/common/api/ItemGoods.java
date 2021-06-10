@@ -21,6 +21,10 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * 아이템-상품 연관 관계 POJO class 입니다.
+ * @author KYoung
+ */
 @Data
 @Builder
 @AllArgsConstructor

@@ -16,6 +16,7 @@
 package com.kmtp.common.http;
 
 import com.kmtp.common.http.error.ResponseErrorHandler;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -24,11 +25,21 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+/**
+ * Spring Webflux Functional Endpoint Response helper class
+ * @author KYoung
+ */
 public class ResponseHandler {
 
     private ResponseHandler() {
     }
 
+    /**
+     * 객체 인스턴스를 {@link List}로 캐스팅 합니다.
+     * @param data {@link Object}
+     * @param <T> POJO
+     * @return {@link List}
+     */
     private static <T> List<T> setData(T data) {
 
         if (data instanceof List) {
@@ -38,6 +49,12 @@ public class ResponseHandler {
         }
     }
 
+    /**
+     * {@link HttpStatus#OK} 상태로 응답 합니다.
+     * @param mono {@link Mono}
+     * @param <T> POJO
+     * @return {@link Mono}<{@link ServerResponse}></{@link>
+     */
     public static <T> Mono<ServerResponse> ok(Mono<? extends T> mono) {
 
         return mono.map(t -> Mono.just(HttpInfo.<T>builder()
@@ -51,12 +68,24 @@ public class ResponseHandler {
                 .onErrorResume(ResponseErrorHandler::build);
     }
 
+    /**
+     * {@link HttpStatus#CREATED} 상태로 응답 합니다.
+     * @param mono {@link Mono}
+     * @param <T> POJO
+     * @return {@link Mono}<{@link ServerResponse}></{@link>
+     */
     public static <T> Mono<ServerResponse> created(Mono<? extends T> mono, URI uri) {
 
         return mono.flatMap(t -> ServerResponse.created(uri).build())
                 .onErrorResume(ResponseErrorHandler::build);
     }
 
+    /**
+     * {@link HttpStatus#NO_CONTENT} 상태로 응답 합니다.
+     * @param mono {@link Mono}
+     * @param <T> POJO
+     * @return {@link Mono}<{@link ServerResponse}></{@link>
+     */
     public static <T> Mono<ServerResponse> noContent(Mono<? extends T> mono) {
 
         return mono.flatMap(t -> ServerResponse.noContent().build())

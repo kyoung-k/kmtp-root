@@ -30,6 +30,16 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * {@link WebClient}를 공통으로 사용하기 위한 helper class 입니다.<br>
+ * <p></p>
+ * TODO 분석 설계를 통해 추후 스마트한 재개발을 고민해보자.<br>
+ * (1) request header나 기본 설정을 할 수있는 기능 고민<br>
+ * (2) 내부에서 사용하는 API와 외부 http 통신을 같이 할 수 있게 고민<br>
+ * (3) 조건에 따른 요청 실행 고민 (if문을 줄이기 위한)
+ * <p></p>
+ * @author KYoung
+ */
 public class WebClientHandler {
 
     private final ApiInfo apiInfo;

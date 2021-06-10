@@ -22,6 +22,11 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 
 import java.util.Map;
 
+/**
+ * Webflux Functional Endpoint Global Error Handler
+ * @see <a href="https://www.baeldung.com/spring-webflux-errors">spring-webflux-errors</a>
+ * @author KYoung
+ */
 @Component
 public class GlobalErrorAttributes extends DefaultErrorAttributes {
 

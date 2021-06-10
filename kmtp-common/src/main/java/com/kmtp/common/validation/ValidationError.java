@@ -18,6 +18,10 @@ package com.kmtp.common.validation;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * 유효성 검사 에러처리 POJO
+ * @author KYoung
+ */
 @Data
 @Builder
 public class ValidationError {

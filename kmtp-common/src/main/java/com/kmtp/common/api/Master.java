@@ -23,6 +23,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * 마스터 POJO class 입니다.
+ * @author KYoung
+ */
 @Data
 @Builder
 @AllArgsConstructor

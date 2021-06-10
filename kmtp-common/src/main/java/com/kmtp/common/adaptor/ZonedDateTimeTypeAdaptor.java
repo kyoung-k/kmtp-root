@@ -21,6 +21,21 @@ import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * <p>{@link Gson}을 사용하여 JSON Response를 파싱할때 {@link ZonedDateTime}을 캐스팅 할때 사용하는 어탭터 입니다.</p>
+ *
+ * <pre>
+ *     {@code
+ *     example :
+ *     new GsonBuilder()
+ *          .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeTypeAdaptor())
+ *          .create()
+ *          .fromJson(jsonBody, TypeToken.getParameterized(HttpInfo.class, clazz).getType())
+ *     }
+ * </pre>
+ *
+ * @author KYoung
+ */
 public class ZonedDateTimeTypeAdaptor implements JsonSerializer<ZonedDateTime>, JsonDeserializer<ZonedDateTime> {
 
     @Override
@@ -38,9 +53,4 @@ public class ZonedDateTimeTypeAdaptor implements JsonSerializer<ZonedDateTime>, 
     public JsonElement serialize(ZonedDateTime src, Type typeOfSrc, JsonSerializationContext context) {
         return new JsonPrimitive(src.format(DateTimeFormatter.ISO_INSTANT));
     }
-
-//  final HttpInfo<T> httpInfo = new GsonBuilder()
-//      .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeTypeAdaptor())
-//      .create()
-//      .fromJson(jsonBody, new TypeToken<HttpInfo<T>>(){}.getType());
 }

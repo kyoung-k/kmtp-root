@@ -19,6 +19,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpMethod;
 
+/**
+ * API 정보를 저장하는 enum class 입니다.
+ * @author KYoung
+ */
 @Getter
 @AllArgsConstructor
 public enum ApiInfo {

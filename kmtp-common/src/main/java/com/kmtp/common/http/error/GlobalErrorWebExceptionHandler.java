@@ -32,6 +32,11 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * Webflux Functional Endpoint Global Error Handler
+ * @see <a href="https://www.baeldung.com/spring-webflux-errors">spring-webflux-errors</a>
+ * @author KYoung
+ */
 @Order(-2)
 @Component
 public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHandler {

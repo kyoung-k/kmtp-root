@@ -21,6 +21,13 @@ import lombok.Data;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+/**
+ * HTTP Error Response POJO
+ * <p>
+ *     기본 에러 응답 템플릿 입니다.
+ * </p>
+ * @author KYoung
+ */
 @Data
 @Builder
 public class HttpErrorInfo {

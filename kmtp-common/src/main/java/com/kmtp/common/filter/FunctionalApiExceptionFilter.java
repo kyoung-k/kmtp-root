@@ -19,9 +19,14 @@ import com.kmtp.common.http.error.ResponseErrorHandler;
 import com.kmtp.common.validation.ValidationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFilterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Spring Webflux Functional Endpoint {@link RouterFunctions} 에서 사용하는 Exception Filter 입니다.
+ * @author KYoung
+ */
 @Component
 public class FunctionalApiExceptionFilter {
 

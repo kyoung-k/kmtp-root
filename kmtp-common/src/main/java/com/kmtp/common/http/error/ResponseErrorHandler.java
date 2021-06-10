@@ -26,6 +26,10 @@ import reactor.core.publisher.Mono;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 
+/**
+ * Spring Webflux Error Response Handler
+ * @author KYoung
+ */
 public class ResponseErrorHandler {
 
     /**

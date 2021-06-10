@@ -27,8 +27,15 @@ import java.util.stream.Stream;
 
 import static java.util.Calendar.DAY_OF_WEEK;
 
+/**
+ * 달력 목록 class 입니다.
+ * @author KYoung
+ */
 public class CalendarList {
 
+    /**
+     * 달력 목록 Http Response 생성을 위한 class 입니다.
+     */
     @Data
     @Builder
     public static class Response {
@@ -37,6 +44,9 @@ public class CalendarList {
         private List<Item> itemList;
     }
 
+    /**
+     * 달력 정보 class 입니다.
+     */
     @Data
     @Builder
     public static class Calendar {
@@ -44,15 +54,36 @@ public class CalendarList {
         private boolean isCalendar;
     }
 
+    /**
+     * 달력 정보 목록을 생성하기 위한 builder class 입니다.
+     */
     public static class CalendarBuilder {
 
+        // 해당월의 시작일(1일)
         private LocalDate startDate;
+        // 해당월의 종료일
         private LocalDate endDate;
+        // 해당월의 달력 시작 일요일
         private LocalDate calendarStartDate;
+        // 해당월의 달력 종료 토요일
         private LocalDate calendarEndDate;
+        // 해당월의 총 일수
         private int monthDay;
+        // 달력 정보 목록
         private Flux<CalendarList.Calendar> calendarFlux;
 
+        /**
+         * 달력 정보 목록 생성을 처리하는 생성자 입니다.
+         * <p></p>
+         * (1) 해당월의 시작일(1일)을 설정합니다.<br>
+         * (2) 해당월의 종료일을 설정합니다.<br>
+         * (3) 해당월의 달력 시작 일요일의 일자를 설정합니다.<br>
+         * (4) 해당월의 달력 종료 토요일의 일자를 설정합니다.<br>
+         * (5) 해당월의 총 일수를 설정합니다.<br>
+         * (6) 달력 정보 목록을 설정합니다.<br>
+         * <p></p>
+         * @param yearMonth {@link YearMonth}
+         */
         public CalendarBuilder(YearMonth yearMonth) {
 
             this.startDate = yearMonth.atDay(1);
@@ -73,6 +104,11 @@ public class CalendarList {
                     );
         }
 
+        /**
+         * 달력 정보 목록을 생성하고 리턴 합니다.
+         * @param yearMonth {@link YearMonth}
+         * @return {@link Flux}<{@link CalendarList.Calendar}></{@link>
+         */
         public static Flux<CalendarList.Calendar> of(YearMonth yearMonth) {
             CalendarBuilder calendarBuilder = new CalendarBuilder(yearMonth);
             return calendarBuilder.calendarFlux;

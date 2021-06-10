@@ -19,6 +19,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+/**
+ * Error Handling helper class 입니다.
+ * @author KYoung
+ */
 public class GenericError {
 
     public static void error(HttpStatus httpStatus, String message) {

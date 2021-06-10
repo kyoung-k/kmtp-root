@@ -15,14 +15,20 @@
  */
 package com.kmtp.common.generic;
 
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.springframework.data.relational.core.mapping.Table;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * {@link Mapper} helper interface 입니다.
+ * @param <D> {@link Table} Entity
+ * @param <E> POJO class
+ */
 public interface GenericMapper <D, E> {
 
     D entityToApi(E entity);
