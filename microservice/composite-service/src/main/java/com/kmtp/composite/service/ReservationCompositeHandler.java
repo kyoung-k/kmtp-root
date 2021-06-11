@@ -19,8 +19,10 @@ import com.kmtp.common.api.*;
 import com.kmtp.common.generic.GenericError;
 import com.kmtp.common.http.ResponseHandler;
 import com.kmtp.common.http.WebClientHandler;
+import com.kmtp.common.api.ApiInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -43,6 +45,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class ReservationCompositeHandler {
+
+    @Value("${app.master-service.host}")
+    private String host;
 
     @Autowired
     public ReservationCompositeHandler() {

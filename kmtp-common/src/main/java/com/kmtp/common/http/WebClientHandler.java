@@ -98,7 +98,7 @@ public class WebClientHandler {
     }
 
     private enum MethodType {
-        GET(webClientHandler -> getWebClient()
+        GET(webClientHandler -> getWebClient(webClientHandler.apiInfo.getHost())
                 .method(webClientHandler.apiInfo.getHttpMethod())
                 .uri(uriBuilder -> createUri(uriBuilder, webClientHandler))
                 .retrieve()
@@ -114,8 +114,8 @@ public class WebClientHandler {
 
         private final Function<WebClientHandler, WebClient.ResponseSpec> function;
 
-        private static WebClient getWebClient() {
-            return WebClient.builder().baseUrl("http://localhost").build();
+        private static WebClient getWebClient(String host) {
+            return WebClient.builder().baseUrl("http://"+host).build();
         }
 
         private static URI createUri(UriBuilder uriBuilder, WebClientHandler webClientHandler) {

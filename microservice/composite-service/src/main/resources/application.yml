@@ -1,5 +1,4 @@
-server:
-  port: 8880
+server.port: 8880
 
 spring.r2dbc:
   url: r2dbc:mysql://localhost:3306/kmtp?useUnicode=true&characterEncoding=utf8
@@ -8,7 +7,31 @@ spring.r2dbc:
 
 logging:
   level:
-    org:
-      springframework:
-        data:
-          r2dbc: DEBUG
+    root: INFO
+    com.kmtp: DEBUG
+
+app:
+  master-service:
+    host: localhost
+    port: 8881
+  reservation-service:
+    host: localhost
+    port: 8882
+
+---
+spring.profiles: docker
+
+server.port: 8080
+
+spring.r2dbc:
+  url: r2dbc:mysql://localhost:3306/kmtp?useUnicode=true&characterEncoding=utf8
+  username: kyoung
+  password: password
+
+app:
+  master-service:
+    host: master
+    port: 8080
+  reservation-service:
+    host: reservation
+    port: 8080

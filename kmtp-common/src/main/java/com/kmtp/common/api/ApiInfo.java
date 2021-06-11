@@ -15,8 +15,10 @@
  */
 package com.kmtp.common.api;
 
+import com.kmtp.common.api.ServiceInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 
 /**
@@ -27,43 +29,44 @@ import org.springframework.http.HttpMethod;
 @AllArgsConstructor
 public enum ApiInfo {
 
-    MASTER_GET(HttpMethod.GET, 8881, "/master/{id}"),
-    MASTER_POST(HttpMethod.POST, 8881, "/master"),
-    MASTER_PUT(HttpMethod.PUT, 8881, "/master/{id}"),
-    MASTER_DELETE(HttpMethod.DELETE, 8881, "/master/{id}"),
+    MASTER_GET(HttpMethod.GET, ServiceInfo.masterHost, ServiceInfo.masterPort, "/master/{id}"),
+    MASTER_POST(HttpMethod.POST, ServiceInfo.masterHost, ServiceInfo.masterPort, "/master"),
+    MASTER_PUT(HttpMethod.PUT, ServiceInfo.masterHost, ServiceInfo.masterPort, "/master/{id}"),
+    MASTER_DELETE(HttpMethod.DELETE, ServiceInfo.masterHost, ServiceInfo.masterPort, "/master/{id}"),
 
-    MEMBER_GET(HttpMethod.GET, 8881, "/member/{id}"),
-    MEMBER_POST(HttpMethod.POST, 8881, "/member"),
-    MEMBER_PUT(HttpMethod.PUT, 8881, "/member/{id}"),
-    MEMBER_DELETE(HttpMethod.DELETE, 8881, "/member/{id}"),
+    MEMBER_GET(HttpMethod.GET, ServiceInfo.masterHost, ServiceInfo.masterPort, "/member/{id}"),
+    MEMBER_POST(HttpMethod.POST, ServiceInfo.masterHost, ServiceInfo.masterPort, "/member"),
+    MEMBER_PUT(HttpMethod.PUT, ServiceInfo.masterHost, ServiceInfo.masterPort, "/member/{id}"),
+    MEMBER_DELETE(HttpMethod.DELETE, ServiceInfo.masterHost, ServiceInfo.masterPort, "/member/{id}"),
 
-    SCHEDULE_GET(HttpMethod.GET, 8881, "/schedule/{masterId}"),
-    SCHEDULE_POST(HttpMethod.POST, 8881, "/schedule/{masterId}"),
-    SCHEDULE_DELETE(HttpMethod.DELETE, 8881, "/schedule/{masterId}"),
+    SCHEDULE_GET(HttpMethod.GET, ServiceInfo.masterHost, ServiceInfo.masterPort, "/schedule/{masterId}"),
+    SCHEDULE_POST(HttpMethod.POST, ServiceInfo.masterHost, ServiceInfo.masterPort, "/schedule/{masterId}"),
+    SCHEDULE_DELETE(HttpMethod.DELETE, ServiceInfo.masterHost, ServiceInfo.masterPort, "/schedule/{masterId}"),
 
-    ITEM_LIST(HttpMethod.GET, 8882, "/item"),
-    ITEM_GET(HttpMethod.GET, 8882, "/item/{id}"),
-    ITEM_POST(HttpMethod.POST, 8882, "/item"),
-    ITEM_PUT(HttpMethod.PUT, 8882, "/item/{id}"),
-    ITEM_DELETE(HttpMethod.DELETE, 8882, "/item/{id}"),
+    ITEM_LIST(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/item"),
+    ITEM_GET(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/item/{id}"),
+    ITEM_POST(HttpMethod.POST, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/item"),
+    ITEM_PUT(HttpMethod.PUT, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/item/{id}"),
+    ITEM_DELETE(HttpMethod.DELETE, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/item/{id}"),
 
-    GOODS_LIST(HttpMethod.GET, 8882, "/goods"),
-    GOODS_GET(HttpMethod.GET, 8882, "/goods/{id}"),
-    GOODS_POST(HttpMethod.POST, 8882, "/goods"),
-    GOODS_PUT(HttpMethod.PUT, 8882, "/goods/{id}"),
-    GOODS_DELETE(HttpMethod.DELETE, 8882, "/goods/{id}"),
+    GOODS_LIST(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/goods"),
+    GOODS_GET(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/goods/{id}"),
+    GOODS_POST(HttpMethod.POST, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/goods"),
+    GOODS_PUT(HttpMethod.PUT, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/goods/{id}"),
+    GOODS_DELETE(HttpMethod.DELETE, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/goods/{id}"),
 
-    ITEMGOODS_ITEMLIST(HttpMethod.GET, 8882, "/itemGoods/item/{itemId}"),
-    ITEMGOODS_GOODSLIST(HttpMethod.GET, 8882, "/itemGoods/goods/{goodsId}"),
-    ITEMGOODS_POST(HttpMethod.GET, 8882, "/itemGoods/{goodsId}"),
-    ITEMGOODS_DELETE(HttpMethod.GET, 8882, "/itemGoods/{goodsId}"),
+    ITEMGOODS_ITEMLIST(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/itemGoods/item/{itemId}"),
+    ITEMGOODS_GOODSLIST(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/itemGoods/goods/{goodsId}"),
+    ITEMGOODS_POST(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/itemGoods/{goodsId}"),
+    ITEMGOODS_DELETE(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/itemGoods/{goodsId}"),
 
-    RESERVATION_PERIOD_CHECK(HttpMethod.GET, 8882, "/reservation/period-check"),
-    RESERVATION_DATE_CHECK(HttpMethod.GET, 8882, "/reservation/date-check"),
-    RESERVATION_POST(HttpMethod.POST, 8882, "/reservation"),
+    RESERVATION_PERIOD_CHECK(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/reservation/period-check"),
+    RESERVATION_DATE_CHECK(HttpMethod.GET, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/reservation/date-check"),
+    RESERVATION_POST(HttpMethod.POST, ServiceInfo.reservationHost, ServiceInfo.reservationPort, "/reservation"),
     ;
 
     private final HttpMethod httpMethod;
+    private final String host; 
     private final int port;
     private final String path;
 }

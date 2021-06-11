@@ -41,3 +41,8 @@ dependencies {
 
     testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }
+
+bootRun {
+    String activeProfile = System.properties['spring.profiles.active']
+    systemProperty "spring.profiles.active", activeProfile
+}

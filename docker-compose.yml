@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  composite:
+    build: microservice/composite-service
+    mem_limit: 350m
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  master:
+    build: microservice/master-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  reservetion:
+    build: microservice/reservation-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
