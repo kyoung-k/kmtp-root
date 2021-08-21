@@ -1,6 +1,19 @@
 version: '3.7'
 
 services:
+
+  master:
+    build: microservice/master-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  reservation:
+    build: microservice/reservation-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
   composite:
     build: microservice/composite-service
     mem_limit: 350m
@@ -9,15 +22,18 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
 
-  master:
-    build: microservice/master-service
+  mysql:
+    image: mysql
     mem_limit: 350m
+    ports:
+      - "3306:3306"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-
-  reservetion:
-    build: microservice/reservation-service
-    mem_limit: 350m
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=kmtp
+      - MYSQL_USER=kyoung
+      - MYSQL_PASSWORD=password
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-uuser", "-ppwd", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10

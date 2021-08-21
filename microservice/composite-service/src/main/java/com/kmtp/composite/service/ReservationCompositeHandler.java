@@ -46,9 +46,6 @@ import java.util.stream.Collectors;
 @Component
 public class ReservationCompositeHandler {
 
-    @Value("${app.master-service.host}")
-    private String host;
-
     @Autowired
     public ReservationCompositeHandler() {
     }
@@ -65,7 +62,7 @@ public class ReservationCompositeHandler {
      *
      * <p></p>
      * @param request {@link ServerRequest}
-     * @return {@link Mono}<{@link List}<{@link ItemList.Response}>></{@link>
+     * @return {@link Mono}<{@link List}<{@link ItemList.Response}>>{@link}
      */
     public Mono<ServerResponse> itemList(ServerRequest request) {
 
@@ -116,7 +113,7 @@ public class ReservationCompositeHandler {
      * (4) 조회한 {@link Item} 정보를 {@link GoodsList.Response}에 설정하고 반환합니다.
      * <p></p>
      * @param request {@link ServerRequest}
-     * @return {@link Mono}<{@link List}<{@link ItemList.Response}>></{@link>
+     * @return {@link Mono}<{@link List}<{@link ItemList.Response}>>{@link}
      */
     public Mono<ServerResponse> goodsList(ServerRequest request) {
 
@@ -171,7 +168,7 @@ public class ReservationCompositeHandler {
      * {@link ReservationDetail.ScheduleCheck} 으로 변환하고 {@link List#size()}값으로 변환합니다.<br>
      * (8) {@link CalendarList.Response}로 변환하고 {@link CalendarList.Response#getDate()} 값으로 오름차순 정렬 합니다.
      * <p></p>
-     * @param request
+     * @param request {@link ServerRequest}
      * @return {@link Mono}<{@link List}
      */
     public Mono<ServerResponse> calendarList(ServerRequest request) {
@@ -263,7 +260,7 @@ public class ReservationCompositeHandler {
      * {@link Predicate}를 사용해서 요청하는 방식으로 수정하거나 다른 함수형 프로그래밍 방법을 고민하자.
      * <p></p>
      * @param request {@link ServerRequest}
-     * @return {@link Mono}<{@link ReservationDetail.Response}></{@link>
+     * @return {@link Mono}<{@link ReservationDetail.Response}>{@link}
      */
     public Mono<ServerResponse> detail(ServerRequest request) {
 
@@ -280,7 +277,7 @@ public class ReservationCompositeHandler {
         // (3)
         final Long goodsId = request.queryParam("goodsId")
                 .map(Long::parseLong)
-                .orElse(0l);
+                .orElse(0L);
 
         // (4)
         final String startDate = request.queryParam("startDate")
